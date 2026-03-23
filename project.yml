@@ -1,0 +1,24 @@
+name: PocketDev
+options:
+  bundleIdPrefix: com.pocketdev
+  deploymentTarget:
+    iOS: "16.0"
+  xcodeVersion: "15"
+  createIntermediateGroups: true
+
+settings:
+  SWIFT_VERSION: "5.9"
+  DEVELOPMENT_TEAM: ""
+
+targets:
+  PocketDev:
+    type: application
+    platform: iOS
+    deploymentTarget: "16.0"
+    sources:
+      - path: PocketDev
+    settings:
+      PRODUCT_BUNDLE_IDENTIFIER: com.pocketdev.app
+      INFOPLIST_FILE: PocketDev/Info.plist
+      MARKETING_VERSION: "1.0"
+      CURRENT_PROJECT_VERSION: "1"
