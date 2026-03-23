@@ -12,6 +12,7 @@ struct HomeView: View {
     @State private var showNewProject = false
     @State private var showFilePicker = false
     @State private var showFolderPicker = false
+    @State private var showCloneRepo = false
     @State private var navigateToEditor = false
     @State private var navPath = NavigationPath()
 
@@ -57,6 +58,11 @@ struct HomeView: View {
                 navPath.append(project)
             }
         }
+        .sheet(isPresented: $showCloneRepo) {
+            CloneRepoView(projectService: projectService) { project in
+                navPath.append(project)
+            }
+        }
     }
 
     // MARK: - Header
@@ -90,6 +96,9 @@ struct HomeView: View {
             }
             ActionTile(icon: "folder", label: "Open Folder") {
                 showFolderPicker = true
+            }
+            ActionTile(icon: "arrow.down.circle", label: "Clone Repo") {
+                showCloneRepo = true
             }
         }
         .padding(.horizontal, Tokens.Spacing.lg)

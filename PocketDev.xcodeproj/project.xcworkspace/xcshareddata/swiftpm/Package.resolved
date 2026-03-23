@@ -1,0 +1,15 @@
+{
+  "originHash" : "73044a144ea3551ad5735202f446e5172b4ac8b9a72f113a9da9d5a7cad71158",
+  "pins" : [
+    {
+      "identity" : "libgit2",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/ibrahimcetin/libgit2",
+      "state" : {
+        "revision" : "6e627a8d345d9de7df6f69c134ec5dfa81e75ade",
+        "version" : "1.8.0"
+      }
+    }
+  ],
+  "version" : 3
+}

@@ -38,6 +38,34 @@ final class ProjectService: ObservableObject {
         return project
     }
 
+    // MARK: - Import (post-clone)
+
+    func destinationURL(for name: String) throws -> URL {
+        let docs = try fileManager.url(
+            for: .documentDirectory,
+            in: .userDomainMask,
+            appropriateFor: nil,
+            create: true
+        )
+        var candidate = docs.appendingPathComponent(name, isDirectory: true)
+        var suffix = 2
+        while fileManager.fileExists(atPath: candidate.path) {
+            candidate = docs.appendingPathComponent("\(name)-\(suffix)", isDirectory: true)
+            suffix += 1
+        }
+        return candidate
+    }
+
+    func importProject(at url: URL, name: String) -> Project {
+        if let existing = projects.first(where: { $0.rootPath == url.path }) {
+            return existing
+        }
+        let project = Project(name: name, rootURL: url)
+        projects.insert(project, at: 0)
+        save()
+        return project
+    }
+
     // MARK: - Persistence
 
     private func load() {

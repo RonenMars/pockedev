@@ -7,43 +7,52 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		040A37DFEC184892A5DE3CA7 /* SearchOverlay.swift in Sources */ = {isa = PBXBuildFile; fileRef = 61F3E7AF3D804146B340DAE9 /* SearchOverlay.swift */; };
-		B2F4E8AC1D3A4F0C9E72D305 /* SyntaxHighlighter.swift in Sources */ = {isa = PBXBuildFile; fileRef = C9A51F7E82B34DE1B0F63892 /* SyntaxHighlighter.swift */; };
 		0B0C5D79DC518013482D571D /* ExplorerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 75FC08B62C530F3BE3C74AAD /* ExplorerView.swift */; };
 		16715AA03D71EE0B89EC823E /* DocumentSessionStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1007ACE3C5E4BCE053C159BC /* DocumentSessionStore.swift */; };
-		16CBCC98D9014F6EAC8C6FE0 /* DocumentPickerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = EA340ACD0D0C41ED950988D0 /* DocumentPickerView.swift */; };
 		237E89B0C580575F92E568D4 /* PocketDevApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = D432B12D17AF19A824AE5295 /* PocketDevApp.swift */; };
 		2879DE6CA8845A08158A8DA4 /* Project.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3E7A8CDFA7D35E2812B95B53 /* Project.swift */; };
+		50934FBDC5B827868E1CC63A /* libgit2 in Frameworks */ = {isa = PBXBuildFile; productRef = 51D8DEB5F557E3A398ED495D /* libgit2 */; };
+		54D6C9B842979C82D46907B7 /* GitCloneError.swift in Sources */ = {isa = PBXBuildFile; fileRef = 43D8582D861EBBF5B2D7F568 /* GitCloneError.swift */; };
 		5A17AF0DBF901969F16C4342 /* NewProjectView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D7D2377D537104542C14FEF3 /* NewProjectView.swift */; };
 		5E7977DA70FDBC7B95E1DDDC /* ProjectService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7895FFF44D82E632BFF3E834 /* ProjectService.swift */; };
 		6A6CD7915F34E69345879899 /* FileService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0E1AF49239B664BED437858D /* FileService.swift */; };
+		6CBCAF0D32135EE93518B74E /* SearchOverlay.swift in Sources */ = {isa = PBXBuildFile; fileRef = E02B48D4777D8068D66F0B07 /* SearchOverlay.swift */; };
 		7A5E29841B31C7B458B0D856 /* PDInput.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7C27092BBC31976CD762D15B /* PDInput.swift */; };
+		85519AB7FA16325AB9707EF4 /* DocumentPickerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0031DCA73F2438CD3DFCE5A7 /* DocumentPickerView.swift */; };
 		90C50B742EB5EE437D9068C1 /* PDTopBar.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52978204E6E0AC17F21F922B /* PDTopBar.swift */; };
 		9B480BE8F15753171B41BB6B /* PDButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0FDCAF19160CC577F365F325 /* PDButton.swift */; };
 		A7B5AB13CD56FAD1889487A3 /* HomeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 696BEA798630E25D81D2D094 /* HomeView.swift */; };
 		A92D66CAE6AC06780376E617 /* PDEmptyState.swift in Sources */ = {isa = PBXBuildFile; fileRef = F0773B930CE3ADDE512959FD /* PDEmptyState.swift */; };
+		B454211A02F7D5B1095C0448 /* Libgit2Manager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 497473857FEB948C188D16B4 /* Libgit2Manager.swift */; };
+		B6AA61853C7A93BE16C3F9EB /* CloneRepoViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04EE7C60C10BD094A7547911 /* CloneRepoViewModel.swift */; };
+		B8D48ADCE3BF18B8747ACAAC /* GitService.swift in Sources */ = {isa = PBXBuildFile; fileRef = D95E083FA5259D538F980790 /* GitService.swift */; };
 		BC5B2506C44DA54EA5924B8B /* TabsBar.swift in Sources */ = {isa = PBXBuildFile; fileRef = 23178CB015056057146AFD9C /* TabsBar.swift */; };
 		D51DEBDDB08EACDEED6B6F5B /* CodeEditorView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1C87BB4D1DA02B92FF2C00EC /* CodeEditorView.swift */; };
 		D5E279D8C34CEFA4DE7E0702 /* EditorContainerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A06CBB68A4146F29DC56A29E /* EditorContainerView.swift */; };
+		DA7993776DBE4F51166004F1 /* SyntaxHighlighter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4DE22E46A7CA3ACCB1765926 /* SyntaxHighlighter.swift */; };
 		DAFE3BC6452121A437BFB1D2 /* DocumentSession.swift in Sources */ = {isa = PBXBuildFile; fileRef = B68AD1A49BAA139E4FF75532 /* DocumentSession.swift */; };
 		E788837AF4E125E7DB1B9832 /* FileRow.swift in Sources */ = {isa = PBXBuildFile; fileRef = B3A26D0F76DF06C946071AB1 /* FileRow.swift */; };
 		E86D1FB8217B33EF2FAD49DB /* PDSurface.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5CC8565AB1051B2AB7CA5380 /* PDSurface.swift */; };
 		EFD5F9E2059D496AC607CAA1 /* Tokens.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0F62632A325795350AC07F3A /* Tokens.swift */; };
+		F5574E84CA09C8A39EB7B4E7 /* CloneRepoView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E8B49101FC866AC71373ACD3 /* CloneRepoView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		0031DCA73F2438CD3DFCE5A7 /* DocumentPickerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DocumentPickerView.swift; sourceTree = "<group>"; };
+		04EE7C60C10BD094A7547911 /* CloneRepoViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CloneRepoViewModel.swift; sourceTree = "<group>"; };
 		0E1AF49239B664BED437858D /* FileService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FileService.swift; sourceTree = "<group>"; };
-		C9A51F7E82B34DE1B0F63892 /* SyntaxHighlighter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SyntaxHighlighter.swift; sourceTree = "<group>"; };
 		0F62632A325795350AC07F3A /* Tokens.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Tokens.swift; sourceTree = "<group>"; };
 		0FDCAF19160CC577F365F325 /* PDButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PDButton.swift; sourceTree = "<group>"; };
 		1007ACE3C5E4BCE053C159BC /* DocumentSessionStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DocumentSessionStore.swift; sourceTree = "<group>"; };
 		1C87BB4D1DA02B92FF2C00EC /* CodeEditorView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CodeEditorView.swift; sourceTree = "<group>"; };
 		23178CB015056057146AFD9C /* TabsBar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TabsBar.swift; sourceTree = "<group>"; };
 		3E7A8CDFA7D35E2812B95B53 /* Project.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Project.swift; sourceTree = "<group>"; };
+		43D8582D861EBBF5B2D7F568 /* GitCloneError.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GitCloneError.swift; sourceTree = "<group>"; };
+		497473857FEB948C188D16B4 /* Libgit2Manager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Libgit2Manager.swift; sourceTree = "<group>"; };
+		4DE22E46A7CA3ACCB1765926 /* SyntaxHighlighter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SyntaxHighlighter.swift; sourceTree = "<group>"; };
 		52978204E6E0AC17F21F922B /* PDTopBar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PDTopBar.swift; sourceTree = "<group>"; };
 		5CC8565AB1051B2AB7CA5380 /* PDSurface.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PDSurface.swift; sourceTree = "<group>"; };
 		5D3092F7E19AD10E430F56FD /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
-		61F3E7AF3D804146B340DAE9 /* SearchOverlay.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SearchOverlay.swift; sourceTree = "<group>"; };
 		696BEA798630E25D81D2D094 /* HomeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeView.swift; sourceTree = "<group>"; };
 		75FC08B62C530F3BE3C74AAD /* ExplorerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExplorerView.swift; sourceTree = "<group>"; };
 		7895FFF44D82E632BFF3E834 /* ProjectService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProjectService.swift; sourceTree = "<group>"; };
@@ -53,10 +62,23 @@
 		B68AD1A49BAA139E4FF75532 /* DocumentSession.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DocumentSession.swift; sourceTree = "<group>"; };
 		D432B12D17AF19A824AE5295 /* PocketDevApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PocketDevApp.swift; sourceTree = "<group>"; };
 		D7D2377D537104542C14FEF3 /* NewProjectView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewProjectView.swift; sourceTree = "<group>"; };
-		D87871D5CDCD84FFB90C7AC3 /* PocketDev.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = PocketDev.app; sourceTree = BUILT_PRODUCTS_DIR; };
-		EA340ACD0D0C41ED950988D0 /* DocumentPickerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DocumentPickerView.swift; sourceTree = "<group>"; };
+		D87871D5CDCD84FFB90C7AC3 /* PocketDev.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = PocketDev.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		D95E083FA5259D538F980790 /* GitService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GitService.swift; sourceTree = "<group>"; };
+		E02B48D4777D8068D66F0B07 /* SearchOverlay.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SearchOverlay.swift; sourceTree = "<group>"; };
+		E8B49101FC866AC71373ACD3 /* CloneRepoView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CloneRepoView.swift; sourceTree = "<group>"; };
 		F0773B930CE3ADDE512959FD /* PDEmptyState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PDEmptyState.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		760C44DD600D047352FE2271 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				50934FBDC5B827868E1CC63A /* libgit2 in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
 		0BE3E86FEB26B1E198F9EE1C /* NewProject */ = {
@@ -71,8 +93,11 @@
 			isa = PBXGroup;
 			children = (
 				0E1AF49239B664BED437858D /* FileService.swift */,
+				43D8582D861EBBF5B2D7F568 /* GitCloneError.swift */,
+				D95E083FA5259D538F980790 /* GitService.swift */,
+				497473857FEB948C188D16B4 /* Libgit2Manager.swift */,
 				7895FFF44D82E632BFF3E834 /* ProjectService.swift */,
-				C9A51F7E82B34DE1B0F63892 /* SyntaxHighlighter.swift */,
+				4DE22E46A7CA3ACCB1765926 /* SyntaxHighlighter.swift */,
 			);
 			path = Services;
 			sourceTree = "<group>";
@@ -108,7 +133,9 @@
 		66631905CEAE56AD129FFB8C /* Home */ = {
 			isa = PBXGroup;
 			children = (
-				EA340ACD0D0C41ED950988D0 /* DocumentPickerView.swift */,
+				E8B49101FC866AC71373ACD3 /* CloneRepoView.swift */,
+				04EE7C60C10BD094A7547911 /* CloneRepoViewModel.swift */,
+				0031DCA73F2438CD3DFCE5A7 /* DocumentPickerView.swift */,
 				696BEA798630E25D81D2D094 /* HomeView.swift */,
 			);
 			path = Home;
@@ -148,7 +175,7 @@
 			children = (
 				1C87BB4D1DA02B92FF2C00EC /* CodeEditorView.swift */,
 				A06CBB68A4146F29DC56A29E /* EditorContainerView.swift */,
-				61F3E7AF3D804146B340DAE9 /* SearchOverlay.swift */,
+				E02B48D4777D8068D66F0B07 /* SearchOverlay.swift */,
 				23178CB015056057146AFD9C /* TabsBar.swift */,
 			);
 			path = Editor;
@@ -193,6 +220,7 @@
 			buildConfigurationList = 586E3329C95AAE69412E02BA /* Build configuration list for PBXNativeTarget "PocketDev" */;
 			buildPhases = (
 				DB423E731C7EA97DF46EDC02 /* Sources */,
+				760C44DD600D047352FE2271 /* Frameworks */,
 			);
 			buildRules = (
 			);
@@ -200,6 +228,7 @@
 			);
 			name = PocketDev;
 			packageProductDependencies = (
+				51D8DEB5F557E3A398ED495D /* libgit2 */,
 			);
 			productName = PocketDev;
 			productReference = D87871D5CDCD84FFB90C7AC3 /* PocketDev.app */;
@@ -212,7 +241,7 @@
 			isa = PBXProject;
 			attributes = {
 				BuildIndependentTargetsInParallel = YES;
-				LastUpgradeCheck = 2630;
+				LastUpgradeCheck = 1500;
 				TargetAttributes = {
 					A914BF257C35CF29E3DE51D4 = {
 						DevelopmentTeam = "";
@@ -228,6 +257,9 @@
 			);
 			mainGroup = 6B546D133395F552B177514D;
 			minimizedProjectReferenceProxies = 1;
+			packageReferences = (
+				FB7289A1ACC3B1C90C411CE5 /* XCRemoteSwiftPackageReference "libgit2" */,
+			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = A043D45E1F35080DF972FB33 /* Products */;
 			projectDirPath = "";
@@ -243,14 +275,20 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				F5574E84CA09C8A39EB7B4E7 /* CloneRepoView.swift in Sources */,
+				B6AA61853C7A93BE16C3F9EB /* CloneRepoViewModel.swift in Sources */,
 				D51DEBDDB08EACDEED6B6F5B /* CodeEditorView.swift in Sources */,
+				85519AB7FA16325AB9707EF4 /* DocumentPickerView.swift in Sources */,
 				DAFE3BC6452121A437BFB1D2 /* DocumentSession.swift in Sources */,
 				16715AA03D71EE0B89EC823E /* DocumentSessionStore.swift in Sources */,
 				D5E279D8C34CEFA4DE7E0702 /* EditorContainerView.swift in Sources */,
 				0B0C5D79DC518013482D571D /* ExplorerView.swift in Sources */,
 				E788837AF4E125E7DB1B9832 /* FileRow.swift in Sources */,
 				6A6CD7915F34E69345879899 /* FileService.swift in Sources */,
+				54D6C9B842979C82D46907B7 /* GitCloneError.swift in Sources */,
+				B8D48ADCE3BF18B8747ACAAC /* GitService.swift in Sources */,
 				A7B5AB13CD56FAD1889487A3 /* HomeView.swift in Sources */,
+				B454211A02F7D5B1095C0448 /* Libgit2Manager.swift in Sources */,
 				5A17AF0DBF901969F16C4342 /* NewProjectView.swift in Sources */,
 				9B480BE8F15753171B41BB6B /* PDButton.swift in Sources */,
 				A92D66CAE6AC06780376E617 /* PDEmptyState.swift in Sources */,
@@ -260,11 +298,10 @@
 				237E89B0C580575F92E568D4 /* PocketDevApp.swift in Sources */,
 				2879DE6CA8845A08158A8DA4 /* Project.swift in Sources */,
 				5E7977DA70FDBC7B95E1DDDC /* ProjectService.swift in Sources */,
+				6CBCAF0D32135EE93518B74E /* SearchOverlay.swift in Sources */,
+				DA7993776DBE4F51166004F1 /* SyntaxHighlighter.swift in Sources */,
 				BC5B2506C44DA54EA5924B8B /* TabsBar.swift in Sources */,
 				EFD5F9E2059D496AC607CAA1 /* Tokens.swift in Sources */,
-				040A37DFEC184892A5DE3CA7 /* SearchOverlay.swift in Sources */,
-				16CBCC98D9014F6EAC8C6FE0 /* DocumentPickerView.swift in Sources */,
-				B2F4E8AC1D3A4F0C9E72D305 /* SyntaxHighlighter.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -309,7 +346,6 @@
 				DEVELOPMENT_TEAM = "";
 				ENABLE_NS_ASSERTIONS = NO;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
-				ENABLE_USER_SCRIPT_SANDBOXING = YES;
 				GCC_C_LANGUAGE_STANDARD = gnu11;
 				GCC_NO_COMMON_BLOCKS = YES;
 				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
@@ -323,7 +359,6 @@
 				MTL_FAST_MATH = YES;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = iphoneos;
-				STRING_CATALOG_GENERATE_SYMBOLS = YES;
 				SWIFT_COMPILATION_MODE = wholemodule;
 				SWIFT_OPTIMIZATION_LEVEL = "-O";
 				SWIFT_VERSION = 5.9;
@@ -368,7 +403,6 @@
 				DEVELOPMENT_TEAM = "";
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				ENABLE_TESTABILITY = YES;
-				ENABLE_USER_SCRIPT_SANDBOXING = YES;
 				GCC_C_LANGUAGE_STANDARD = gnu11;
 				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_NO_COMMON_BLOCKS = YES;
@@ -389,7 +423,6 @@
 				ONLY_ACTIVE_ARCH = YES;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = iphoneos;
-				STRING_CATALOG_GENERATE_SYMBOLS = YES;
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				SWIFT_VERSION = 5.9;
@@ -456,6 +489,25 @@
 			defaultConfigurationName = Debug;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		FB7289A1ACC3B1C90C411CE5 /* XCRemoteSwiftPackageReference "libgit2" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/ibrahimcetin/libgit2";
+			requirement = {
+				kind = exactVersion;
+				version = 1.8.0;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		51D8DEB5F557E3A398ED495D /* libgit2 */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = FB7289A1ACC3B1C90C411CE5 /* XCRemoteSwiftPackageReference "libgit2" */;
+			productName = libgit2;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = 9B56FFAB358A24C701361E0C /* Project object */;
 }

@@ -10,6 +10,11 @@ settings:
   SWIFT_VERSION: "5.9"
   DEVELOPMENT_TEAM: ""
 
+packages:
+  libgit2:
+    url: https://github.com/ibrahimcetin/libgit2
+    exactVersion: "1.8.0"
+
 targets:
   PocketDev:
     type: application
@@ -17,6 +22,9 @@ targets:
     deploymentTarget: "16.0"
     sources:
       - path: PocketDev
+    dependencies:
+      - package: libgit2
+        product: libgit2
     settings:
       PRODUCT_BUNDLE_IDENTIFIER: com.pocketdev.app
       INFOPLIST_FILE: PocketDev/Info.plist
