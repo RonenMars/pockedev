@@ -1,0 +1,461 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 77;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		040A37DFEC184892A5DE3CA7 /* SearchOverlay.swift in Sources */ = {isa = PBXBuildFile; fileRef = 61F3E7AF3D804146B340DAE9 /* SearchOverlay.swift */; };
+		B2F4E8AC1D3A4F0C9E72D305 /* SyntaxHighlighter.swift in Sources */ = {isa = PBXBuildFile; fileRef = C9A51F7E82B34DE1B0F63892 /* SyntaxHighlighter.swift */; };
+		0B0C5D79DC518013482D571D /* ExplorerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 75FC08B62C530F3BE3C74AAD /* ExplorerView.swift */; };
+		16715AA03D71EE0B89EC823E /* DocumentSessionStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1007ACE3C5E4BCE053C159BC /* DocumentSessionStore.swift */; };
+		16CBCC98D9014F6EAC8C6FE0 /* DocumentPickerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = EA340ACD0D0C41ED950988D0 /* DocumentPickerView.swift */; };
+		237E89B0C580575F92E568D4 /* PocketDevApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = D432B12D17AF19A824AE5295 /* PocketDevApp.swift */; };
+		2879DE6CA8845A08158A8DA4 /* Project.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3E7A8CDFA7D35E2812B95B53 /* Project.swift */; };
+		5A17AF0DBF901969F16C4342 /* NewProjectView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D7D2377D537104542C14FEF3 /* NewProjectView.swift */; };
+		5E7977DA70FDBC7B95E1DDDC /* ProjectService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7895FFF44D82E632BFF3E834 /* ProjectService.swift */; };
+		6A6CD7915F34E69345879899 /* FileService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0E1AF49239B664BED437858D /* FileService.swift */; };
+		7A5E29841B31C7B458B0D856 /* PDInput.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7C27092BBC31976CD762D15B /* PDInput.swift */; };
+		90C50B742EB5EE437D9068C1 /* PDTopBar.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52978204E6E0AC17F21F922B /* PDTopBar.swift */; };
+		9B480BE8F15753171B41BB6B /* PDButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0FDCAF19160CC577F365F325 /* PDButton.swift */; };
+		A7B5AB13CD56FAD1889487A3 /* HomeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 696BEA798630E25D81D2D094 /* HomeView.swift */; };
+		A92D66CAE6AC06780376E617 /* PDEmptyState.swift in Sources */ = {isa = PBXBuildFile; fileRef = F0773B930CE3ADDE512959FD /* PDEmptyState.swift */; };
+		BC5B2506C44DA54EA5924B8B /* TabsBar.swift in Sources */ = {isa = PBXBuildFile; fileRef = 23178CB015056057146AFD9C /* TabsBar.swift */; };
+		D51DEBDDB08EACDEED6B6F5B /* CodeEditorView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1C87BB4D1DA02B92FF2C00EC /* CodeEditorView.swift */; };
+		D5E279D8C34CEFA4DE7E0702 /* EditorContainerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A06CBB68A4146F29DC56A29E /* EditorContainerView.swift */; };
+		DAFE3BC6452121A437BFB1D2 /* DocumentSession.swift in Sources */ = {isa = PBXBuildFile; fileRef = B68AD1A49BAA139E4FF75532 /* DocumentSession.swift */; };
+		E788837AF4E125E7DB1B9832 /* FileRow.swift in Sources */ = {isa = PBXBuildFile; fileRef = B3A26D0F76DF06C946071AB1 /* FileRow.swift */; };
+		E86D1FB8217B33EF2FAD49DB /* PDSurface.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5CC8565AB1051B2AB7CA5380 /* PDSurface.swift */; };
+		EFD5F9E2059D496AC607CAA1 /* Tokens.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0F62632A325795350AC07F3A /* Tokens.swift */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXFileReference section */
+		0E1AF49239B664BED437858D /* FileService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FileService.swift; sourceTree = "<group>"; };
+		C9A51F7E82B34DE1B0F63892 /* SyntaxHighlighter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SyntaxHighlighter.swift; sourceTree = "<group>"; };
+		0F62632A325795350AC07F3A /* Tokens.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Tokens.swift; sourceTree = "<group>"; };
+		0FDCAF19160CC577F365F325 /* PDButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PDButton.swift; sourceTree = "<group>"; };
+		1007ACE3C5E4BCE053C159BC /* DocumentSessionStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DocumentSessionStore.swift; sourceTree = "<group>"; };
+		1C87BB4D1DA02B92FF2C00EC /* CodeEditorView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CodeEditorView.swift; sourceTree = "<group>"; };
+		23178CB015056057146AFD9C /* TabsBar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TabsBar.swift; sourceTree = "<group>"; };
+		3E7A8CDFA7D35E2812B95B53 /* Project.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Project.swift; sourceTree = "<group>"; };
+		52978204E6E0AC17F21F922B /* PDTopBar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PDTopBar.swift; sourceTree = "<group>"; };
+		5CC8565AB1051B2AB7CA5380 /* PDSurface.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PDSurface.swift; sourceTree = "<group>"; };
+		5D3092F7E19AD10E430F56FD /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
+		61F3E7AF3D804146B340DAE9 /* SearchOverlay.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SearchOverlay.swift; sourceTree = "<group>"; };
+		696BEA798630E25D81D2D094 /* HomeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeView.swift; sourceTree = "<group>"; };
+		75FC08B62C530F3BE3C74AAD /* ExplorerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExplorerView.swift; sourceTree = "<group>"; };
+		7895FFF44D82E632BFF3E834 /* ProjectService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProjectService.swift; sourceTree = "<group>"; };
+		7C27092BBC31976CD762D15B /* PDInput.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PDInput.swift; sourceTree = "<group>"; };
+		A06CBB68A4146F29DC56A29E /* EditorContainerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditorContainerView.swift; sourceTree = "<group>"; };
+		B3A26D0F76DF06C946071AB1 /* FileRow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FileRow.swift; sourceTree = "<group>"; };
+		B68AD1A49BAA139E4FF75532 /* DocumentSession.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DocumentSession.swift; sourceTree = "<group>"; };
+		D432B12D17AF19A824AE5295 /* PocketDevApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PocketDevApp.swift; sourceTree = "<group>"; };
+		D7D2377D537104542C14FEF3 /* NewProjectView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewProjectView.swift; sourceTree = "<group>"; };
+		D87871D5CDCD84FFB90C7AC3 /* PocketDev.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = PocketDev.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		EA340ACD0D0C41ED950988D0 /* DocumentPickerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DocumentPickerView.swift; sourceTree = "<group>"; };
+		F0773B930CE3ADDE512959FD /* PDEmptyState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PDEmptyState.swift; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXGroup section */
+		0BE3E86FEB26B1E198F9EE1C /* NewProject */ = {
+			isa = PBXGroup;
+			children = (
+				D7D2377D537104542C14FEF3 /* NewProjectView.swift */,
+			);
+			path = NewProject;
+			sourceTree = "<group>";
+		};
+		10A515542DC1ACCE1AE7D34B /* Services */ = {
+			isa = PBXGroup;
+			children = (
+				0E1AF49239B664BED437858D /* FileService.swift */,
+				7895FFF44D82E632BFF3E834 /* ProjectService.swift */,
+				C9A51F7E82B34DE1B0F63892 /* SyntaxHighlighter.swift */,
+			);
+			path = Services;
+			sourceTree = "<group>";
+		};
+		21783D271268D3B46F3CC38B /* Stores */ = {
+			isa = PBXGroup;
+			children = (
+				1007ACE3C5E4BCE053C159BC /* DocumentSessionStore.swift */,
+			);
+			path = Stores;
+			sourceTree = "<group>";
+		};
+		25000E65FC8960FEE0663A9E /* Explorer */ = {
+			isa = PBXGroup;
+			children = (
+				75FC08B62C530F3BE3C74AAD /* ExplorerView.swift */,
+				B3A26D0F76DF06C946071AB1 /* FileRow.swift */,
+			);
+			path = Explorer;
+			sourceTree = "<group>";
+		};
+		35E45EBB4749AEFC42F4497A /* Screens */ = {
+			isa = PBXGroup;
+			children = (
+				981B290E6D1AD94DC87F5CAF /* Editor */,
+				25000E65FC8960FEE0663A9E /* Explorer */,
+				66631905CEAE56AD129FFB8C /* Home */,
+				0BE3E86FEB26B1E198F9EE1C /* NewProject */,
+			);
+			path = Screens;
+			sourceTree = "<group>";
+		};
+		66631905CEAE56AD129FFB8C /* Home */ = {
+			isa = PBXGroup;
+			children = (
+				EA340ACD0D0C41ED950988D0 /* DocumentPickerView.swift */,
+				696BEA798630E25D81D2D094 /* HomeView.swift */,
+			);
+			path = Home;
+			sourceTree = "<group>";
+		};
+		6B546D133395F552B177514D = {
+			isa = PBXGroup;
+			children = (
+				F39427DBA10F77DD40197922 /* PocketDev */,
+				A043D45E1F35080DF972FB33 /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		824D4E4538C30FB5B40F10EB /* DesignSystem */ = {
+			isa = PBXGroup;
+			children = (
+				0F62632A325795350AC07F3A /* Tokens.swift */,
+				8C7443D196DB4E0AA08E69EB /* Components */,
+			);
+			path = DesignSystem;
+			sourceTree = "<group>";
+		};
+		8C7443D196DB4E0AA08E69EB /* Components */ = {
+			isa = PBXGroup;
+			children = (
+				0FDCAF19160CC577F365F325 /* PDButton.swift */,
+				F0773B930CE3ADDE512959FD /* PDEmptyState.swift */,
+				7C27092BBC31976CD762D15B /* PDInput.swift */,
+				5CC8565AB1051B2AB7CA5380 /* PDSurface.swift */,
+				52978204E6E0AC17F21F922B /* PDTopBar.swift */,
+			);
+			path = Components;
+			sourceTree = "<group>";
+		};
+		981B290E6D1AD94DC87F5CAF /* Editor */ = {
+			isa = PBXGroup;
+			children = (
+				1C87BB4D1DA02B92FF2C00EC /* CodeEditorView.swift */,
+				A06CBB68A4146F29DC56A29E /* EditorContainerView.swift */,
+				61F3E7AF3D804146B340DAE9 /* SearchOverlay.swift */,
+				23178CB015056057146AFD9C /* TabsBar.swift */,
+			);
+			path = Editor;
+			sourceTree = "<group>";
+		};
+		A043D45E1F35080DF972FB33 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				D87871D5CDCD84FFB90C7AC3 /* PocketDev.app */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		DFA8146B5FAF5F0BD17DF6DB /* Models */ = {
+			isa = PBXGroup;
+			children = (
+				B68AD1A49BAA139E4FF75532 /* DocumentSession.swift */,
+				3E7A8CDFA7D35E2812B95B53 /* Project.swift */,
+			);
+			path = Models;
+			sourceTree = "<group>";
+		};
+		F39427DBA10F77DD40197922 /* PocketDev */ = {
+			isa = PBXGroup;
+			children = (
+				5D3092F7E19AD10E430F56FD /* Info.plist */,
+				D432B12D17AF19A824AE5295 /* PocketDevApp.swift */,
+				824D4E4538C30FB5B40F10EB /* DesignSystem */,
+				DFA8146B5FAF5F0BD17DF6DB /* Models */,
+				35E45EBB4749AEFC42F4497A /* Screens */,
+				10A515542DC1ACCE1AE7D34B /* Services */,
+				21783D271268D3B46F3CC38B /* Stores */,
+			);
+			path = PocketDev;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		A914BF257C35CF29E3DE51D4 /* PocketDev */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 586E3329C95AAE69412E02BA /* Build configuration list for PBXNativeTarget "PocketDev" */;
+			buildPhases = (
+				DB423E731C7EA97DF46EDC02 /* Sources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = PocketDev;
+			packageProductDependencies = (
+			);
+			productName = PocketDev;
+			productReference = D87871D5CDCD84FFB90C7AC3 /* PocketDev.app */;
+			productType = "com.apple.product-type.application";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		9B56FFAB358A24C701361E0C /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = YES;
+				LastUpgradeCheck = 2630;
+				TargetAttributes = {
+					A914BF257C35CF29E3DE51D4 = {
+						DevelopmentTeam = "";
+					};
+				};
+			};
+			buildConfigurationList = FF02E42B994B9CBFB54473FF /* Build configuration list for PBXProject "PocketDev" */;
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				Base,
+				en,
+			);
+			mainGroup = 6B546D133395F552B177514D;
+			minimizedProjectReferenceProxies = 1;
+			preferredProjectObjectVersion = 77;
+			productRefGroup = A043D45E1F35080DF972FB33 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				A914BF257C35CF29E3DE51D4 /* PocketDev */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXSourcesBuildPhase section */
+		DB423E731C7EA97DF46EDC02 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				D51DEBDDB08EACDEED6B6F5B /* CodeEditorView.swift in Sources */,
+				DAFE3BC6452121A437BFB1D2 /* DocumentSession.swift in Sources */,
+				16715AA03D71EE0B89EC823E /* DocumentSessionStore.swift in Sources */,
+				D5E279D8C34CEFA4DE7E0702 /* EditorContainerView.swift in Sources */,
+				0B0C5D79DC518013482D571D /* ExplorerView.swift in Sources */,
+				E788837AF4E125E7DB1B9832 /* FileRow.swift in Sources */,
+				6A6CD7915F34E69345879899 /* FileService.swift in Sources */,
+				A7B5AB13CD56FAD1889487A3 /* HomeView.swift in Sources */,
+				5A17AF0DBF901969F16C4342 /* NewProjectView.swift in Sources */,
+				9B480BE8F15753171B41BB6B /* PDButton.swift in Sources */,
+				A92D66CAE6AC06780376E617 /* PDEmptyState.swift in Sources */,
+				7A5E29841B31C7B458B0D856 /* PDInput.swift in Sources */,
+				E86D1FB8217B33EF2FAD49DB /* PDSurface.swift in Sources */,
+				90C50B742EB5EE437D9068C1 /* PDTopBar.swift in Sources */,
+				237E89B0C580575F92E568D4 /* PocketDevApp.swift in Sources */,
+				2879DE6CA8845A08158A8DA4 /* Project.swift in Sources */,
+				5E7977DA70FDBC7B95E1DDDC /* ProjectService.swift in Sources */,
+				BC5B2506C44DA54EA5924B8B /* TabsBar.swift in Sources */,
+				EFD5F9E2059D496AC607CAA1 /* Tokens.swift in Sources */,
+				040A37DFEC184892A5DE3CA7 /* SearchOverlay.swift in Sources */,
+				16CBCC98D9014F6EAC8C6FE0 /* DocumentPickerView.swift in Sources */,
+				B2F4E8AC1D3A4F0C9E72D305 /* SyntaxHighlighter.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin XCBuildConfiguration section */
+		3FCCF7F92E37FC7786F257E6 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				DEVELOPMENT_TEAM = "";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_OPTIMIZATION_LEVEL = "-O";
+				SWIFT_VERSION = 5.9;
+			};
+			name = Release;
+		};
+		40558C7AB276ABBD59D085E6 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				DEVELOPMENT_TEAM = "";
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"$(inherited)",
+					"DEBUG=1",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_VERSION = 5.9;
+			};
+			name = Debug;
+		};
+		A318DF7EF819A65D6333CB27 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				CURRENT_PROJECT_VERSION = 1;
+				INFOPLIST_FILE = PocketDev/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.pocketdev.app;
+				SDKROOT = iphoneos;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
+		F0C3AD44C6B72E9F7EF16EE1 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				CURRENT_PROJECT_VERSION = 1;
+				INFOPLIST_FILE = PocketDev/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.pocketdev.app;
+				SDKROOT = iphoneos;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		586E3329C95AAE69412E02BA /* Build configuration list for PBXNativeTarget "PocketDev" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				F0C3AD44C6B72E9F7EF16EE1 /* Debug */,
+				A318DF7EF819A65D6333CB27 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+		FF02E42B994B9CBFB54473FF /* Build configuration list for PBXProject "PocketDev" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				40558C7AB276ABBD59D085E6 /* Debug */,
+				3FCCF7F92E37FC7786F257E6 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = 9B56FFAB358A24C701361E0C /* Project object */;
+}
