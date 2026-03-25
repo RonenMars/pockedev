@@ -7,6 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		9CD35F1CE49D404883BD8BF8 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 5671099018044E6580E95C41 /* Assets.xcassets */; };
+		1B44BF612E394ADCB0A07FB1 /* KeychainService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3623CE6DF709451A9CDCC902 /* KeychainService.swift */; };
 		0B0C5D79DC518013482D571D /* ExplorerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 75FC08B62C530F3BE3C74AAD /* ExplorerView.swift */; };
 		16715AA03D71EE0B89EC823E /* DocumentSessionStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1007ACE3C5E4BCE053C159BC /* DocumentSessionStore.swift */; };
 		237E89B0C580575F92E568D4 /* PocketDevApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = D432B12D17AF19A824AE5295 /* PocketDevApp.swift */; };
@@ -52,6 +54,8 @@
 		4DE22E46A7CA3ACCB1765926 /* SyntaxHighlighter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SyntaxHighlighter.swift; sourceTree = "<group>"; };
 		52978204E6E0AC17F21F922B /* PDTopBar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PDTopBar.swift; sourceTree = "<group>"; };
 		5CC8565AB1051B2AB7CA5380 /* PDSurface.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PDSurface.swift; sourceTree = "<group>"; };
+		5671099018044E6580E95C41 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		3623CE6DF709451A9CDCC902 /* KeychainService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeychainService.swift; sourceTree = "<group>"; };
 		5D3092F7E19AD10E430F56FD /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
 		696BEA798630E25D81D2D094 /* HomeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeView.swift; sourceTree = "<group>"; };
 		75FC08B62C530F3BE3C74AAD /* ExplorerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExplorerView.swift; sourceTree = "<group>"; };
@@ -62,7 +66,7 @@
 		B68AD1A49BAA139E4FF75532 /* DocumentSession.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DocumentSession.swift; sourceTree = "<group>"; };
 		D432B12D17AF19A824AE5295 /* PocketDevApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PocketDevApp.swift; sourceTree = "<group>"; };
 		D7D2377D537104542C14FEF3 /* NewProjectView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewProjectView.swift; sourceTree = "<group>"; };
-		D87871D5CDCD84FFB90C7AC3 /* PocketDev.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = PocketDev.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		D87871D5CDCD84FFB90C7AC3 /* PocketDev.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = PocketDev.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		D95E083FA5259D538F980790 /* GitService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GitService.swift; sourceTree = "<group>"; };
 		E02B48D4777D8068D66F0B07 /* SearchOverlay.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SearchOverlay.swift; sourceTree = "<group>"; };
 		E8B49101FC866AC71373ACD3 /* CloneRepoView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CloneRepoView.swift; sourceTree = "<group>"; };
@@ -95,6 +99,7 @@
 				0E1AF49239B664BED437858D /* FileService.swift */,
 				43D8582D861EBBF5B2D7F568 /* GitCloneError.swift */,
 				D95E083FA5259D538F980790 /* GitService.swift */,
+				3623CE6DF709451A9CDCC902 /* KeychainService.swift */,
 				497473857FEB948C188D16B4 /* Libgit2Manager.swift */,
 				7895FFF44D82E632BFF3E834 /* ProjectService.swift */,
 				4DE22E46A7CA3ACCB1765926 /* SyntaxHighlighter.swift */,
@@ -201,6 +206,7 @@
 		F39427DBA10F77DD40197922 /* PocketDev */ = {
 			isa = PBXGroup;
 			children = (
+				5671099018044E6580E95C41 /* Assets.xcassets */,
 				5D3092F7E19AD10E430F56FD /* Info.plist */,
 				D432B12D17AF19A824AE5295 /* PocketDevApp.swift */,
 				824D4E4538C30FB5B40F10EB /* DesignSystem */,
@@ -219,6 +225,7 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = 586E3329C95AAE69412E02BA /* Build configuration list for PBXNativeTarget "PocketDev" */;
 			buildPhases = (
+				61212687E8F948A0A87E27CA /* Resources */,
 				DB423E731C7EA97DF46EDC02 /* Sources */,
 				760C44DD600D047352FE2271 /* Frameworks */,
 			);
@@ -242,11 +249,6 @@
 			attributes = {
 				BuildIndependentTargetsInParallel = YES;
 				LastUpgradeCheck = 1500;
-				TargetAttributes = {
-					A914BF257C35CF29E3DE51D4 = {
-						DevelopmentTeam = "";
-					};
-				};
 			};
 			buildConfigurationList = FF02E42B994B9CBFB54473FF /* Build configuration list for PBXProject "PocketDev" */;
 			developmentRegion = en;
@@ -269,6 +271,17 @@
 			);
 		};
 /* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		61212687E8F948A0A87E27CA /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				9CD35F1CE49D404883BD8BF8 /* Assets.xcassets in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
 		DB423E731C7EA97DF46EDC02 /* Sources */ = {
@@ -302,6 +315,7 @@
 				DA7993776DBE4F51166004F1 /* SyntaxHighlighter.swift in Sources */,
 				BC5B2506C44DA54EA5924B8B /* TabsBar.swift in Sources */,
 				EFD5F9E2059D496AC607CAA1 /* Tokens.swift in Sources */,
+				1B44BF612E394ADCB0A07FB1 /* KeychainService.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -435,6 +449,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = GUW6BN8X57;
 				INFOPLIST_FILE = PocketDev/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -454,6 +469,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = GUW6BN8X57;
 				INFOPLIST_FILE = PocketDev/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
 				LD_RUNPATH_SEARCH_PATHS = (
