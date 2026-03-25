@@ -77,6 +77,8 @@ private struct TabCell: View {
                             .background(Tokens.Color.panel)
                             .clipShape(Circle())
                     }
+                    .frame(width: 32, height: 44)
+                    .contentShape(Rectangle())
                     .buttonStyle(.plain)
                 }
             }

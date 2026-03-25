@@ -34,6 +34,7 @@ struct PDTopBar<Trailing: View>: View {
                         .font(.system(size: 16, weight: .regular))
                         .foregroundColor(Tokens.Color.accent)
                         .frame(width: 44, height: 44)
+                        .contentShape(Rectangle())
                 }
                 .buttonStyle(.plain)
             }

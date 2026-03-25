@@ -118,7 +118,6 @@ struct EditorContainerView: View {
                         activeMatchIndex: currentMatchIndex,
                         onTextChange: { sessionStore.updateContent($0, sessionID: session.id) }
                     )
-                    .ignoresSafeArea(.keyboard)
 
                     // Search overlay — slides in from top (DESIGN.md §6.3)
                     if showSearch {
