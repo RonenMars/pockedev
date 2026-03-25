@@ -11,6 +11,7 @@ struct CloneRepoView: View {
 
     @State private var repoURL = ""
     @State private var token = ""
+    @State private var rememberToken = false
     @FocusState private var urlFocused: Bool
 
     init(projectService: ProjectService, onCloned: @escaping (Project) -> Void) {
@@ -32,6 +33,8 @@ struct CloneRepoView: View {
                         .font(.system(size: 15))
                         .foregroundColor(Tokens.Color.textSecondary)
                         .frame(height: 44)
+                        .padding(.horizontal, Tokens.Spacing.md)
+                        .contentShape(Rectangle())
                         .buttonStyle(.plain)
                         .disabled(viewModel.isCloning)
                 }
@@ -47,7 +50,13 @@ struct CloneRepoView: View {
                 Spacer()
             }
         }
-        .onAppear { urlFocused = true }
+        .onAppear {
+            urlFocused = true
+            if let saved = KeychainService.loadToken() {
+                token = saved
+                rememberToken = true
+            }
+        }
         .onChange(of: viewModel.completedProject) { project in
             guard let project else { return }
             dismiss()
@@ -87,7 +96,7 @@ struct CloneRepoView: View {
             PDButton(
                 title: "Clone",
                 variant: .primary,
-                action: { Task { await viewModel.clone(urlString: repoURL, token: token) } },
+                action: { Task { await viewModel.clone(urlString: repoURL, token: token, rememberToken: rememberToken) } },
                 icon: "arrow.down.circle"
             )
             .frame(maxWidth: .infinity)
@@ -119,6 +128,22 @@ struct CloneRepoView: View {
                 .cornerRadius(Tokens.Radius.small)
                 .autocorrectionDisabled()
                 .textInputAutocapitalization(.never)
+
+            Button {
+                rememberToken.toggle()
+            } label: {
+                HStack(spacing: Tokens.Spacing.sm) {
+                    Image(systemName: rememberToken ? "checkmark.square.fill" : "square")
+                        .font(.system(size: 16))
+                        .foregroundColor(rememberToken ? Tokens.Color.accent : Tokens.Color.textSecondary)
+                    Text("Remember token")
+                        .font(.system(size: 13))
+                        .foregroundColor(Tokens.Color.textSecondary)
+                }
+            }
+            .buttonStyle(.plain)
+            .frame(height: 36)
+            .contentShape(Rectangle())
         }
     }
 
@@ -127,14 +152,38 @@ struct CloneRepoView: View {
     private var cloningView: some View {
         VStack(spacing: Tokens.Spacing.xl) {
             Spacer()
-            ProgressView()
-                .tint(Tokens.Color.accent)
-                .scaleEffect(1.5)
-            Text(viewModel.progressMessage)
-                .font(.system(size: 14))
-                .foregroundColor(Tokens.Color.textSecondary)
-                .multilineTextAlignment(.center)
-                .padding(.horizontal, Tokens.Spacing.xxl)
+
+            VStack(spacing: Tokens.Spacing.lg) {
+                // Phase label + percentage
+                HStack {
+                    Text(viewModel.progressMessage)
+                        .font(.system(size: 14))
+                        .foregroundColor(Tokens.Color.textSecondary)
+                    Spacer()
+                    Text("\(Int(viewModel.cloneProgress * 100))%")
+                        .font(.system(size: 14, weight: .semibold).monospacedDigit())
+                        .foregroundColor(Tokens.Color.accent)
+                }
+
+                // Progress bar track
+                GeometryReader { geo in
+                    ZStack(alignment: .leading) {
+                        // Track
+                        RoundedRectangle(cornerRadius: 3)
+                            .fill(Tokens.Color.panel)
+                            .frame(height: 6)
+
+                        // Fill
+                        RoundedRectangle(cornerRadius: 3)
+                            .fill(Tokens.Color.accent)
+                            .frame(width: geo.size.width * viewModel.cloneProgress, height: 6)
+                            .animation(.easeInOut(duration: 0.2), value: viewModel.cloneProgress)
+                    }
+                }
+                .frame(height: 6)
+            }
+            .padding(.horizontal, Tokens.Spacing.xxl)
+
             Spacer()
         }
     }
