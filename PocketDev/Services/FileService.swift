@@ -47,6 +47,77 @@ final class FileService: @unchecked Sendable {
         defer { if accessed { url.stopAccessingSecurityScopedResource() } }
         try content.write(to: url, atomically: true, encoding: .utf8)
     }
+
+    // MARK: - Create / Delete
+
+    func createFile(at url: URL) throws {
+        guard !fileManager.fileExists(atPath: url.path) else {
+            throw FileServiceError.alreadyExists
+        }
+        guard fileManager.createFile(atPath: url.path, contents: nil) else {
+            throw FileServiceError.createFailed
+        }
+    }
+
+    func createDirectory(at url: URL) throws {
+        guard !fileManager.fileExists(atPath: url.path) else {
+            throw FileServiceError.alreadyExists
+        }
+        try fileManager.createDirectory(at: url, withIntermediateDirectories: false)
+    }
+
+    func deleteItem(at url: URL) throws {
+        try fileManager.removeItem(at: url)
+    }
+
+    func moveItem(from source: URL, to destinationDir: URL) throws {
+        let dest = destinationDir.appendingPathComponent(source.lastPathComponent)
+        guard !fileManager.fileExists(atPath: dest.path) else {
+            throw FileServiceError.alreadyExists
+        }
+        try fileManager.moveItem(at: source, to: dest)
+    }
+
+    func copyItem(from source: URL, to destinationDir: URL) throws {
+        let dest = destinationDir.appendingPathComponent(source.lastPathComponent)
+        guard !fileManager.fileExists(atPath: dest.path) else {
+            throw FileServiceError.alreadyExists
+        }
+        try fileManager.copyItem(at: source, to: dest)
+    }
+
+    func allDirectories(in root: URL, depth: Int = 0) -> [DirectoryItem] {
+        let items = (try? listItems(in: root)) ?? []
+        var result: [DirectoryItem] = []
+        for item in items where item.isDirectory {
+            result.append(DirectoryItem(url: item.url, depth: depth))
+            result += allDirectories(in: item.url, depth: depth + 1)
+        }
+        return result
+    }
+}
+
+// MARK: - FileServiceError
+
+enum FileServiceError: LocalizedError {
+    case alreadyExists
+    case createFailed
+
+    var errorDescription: String? {
+        switch self {
+        case .alreadyExists: return "A file or folder with that name already exists."
+        case .createFailed:  return "Could not create the file."
+        }
+    }
+}
+
+// MARK: - DirectoryItem
+
+struct DirectoryItem: Identifiable {
+    var id: URL { url }
+    let url: URL
+    let depth: Int
+    var name: String { url.lastPathComponent }
 }
 
 // MARK: - FileItem

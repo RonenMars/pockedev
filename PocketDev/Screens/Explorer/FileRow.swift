@@ -7,6 +7,8 @@ struct FileRow: View {
     let item: FileItem
     let depth: Int
     let isActive: Bool
+    let isSelecting: Bool
+    let isSelected: Bool
     let action: () -> Void
 
     private var indentWidth: CGFloat { CGFloat(depth) * 16 }
@@ -19,11 +21,18 @@ struct FileRow: View {
                     Spacer().frame(width: indentWidth)
                 }
 
-                // Icon
-                Image(systemName: iconName)
-                    .font(.system(size: 14))
-                    .foregroundColor(iconColor)
-                    .frame(width: 18)
+                // Selection circle or file icon
+                if isSelecting {
+                    Image(systemName: isSelected ? "checkmark.circle.fill" : "circle")
+                        .font(.system(size: 18))
+                        .foregroundColor(isSelected ? Tokens.Color.accent : Tokens.Color.textSecondary)
+                        .frame(width: 18)
+                } else {
+                    Image(systemName: iconName)
+                        .font(.system(size: 14))
+                        .foregroundColor(iconColor)
+                        .frame(width: 18)
+                }
 
                 // Name
                 Text(item.name)
@@ -33,8 +42,8 @@ struct FileRow: View {
 
                 Spacer()
 
-                // Folder disclosure indicator
-                if item.isDirectory {
+                // Folder disclosure indicator (hidden in selection mode)
+                if item.isDirectory && !isSelecting {
                     Image(systemName: "chevron.right")
                         .font(.system(size: 10, weight: .medium))
                         .foregroundColor(Tokens.Color.textSecondary.opacity(0.5))
@@ -42,7 +51,12 @@ struct FileRow: View {
             }
             .frame(minHeight: 44)
             .padding(.horizontal, Tokens.Spacing.lg)
-            .background(isActive ? Tokens.Color.accent.opacity(0.08) : Color.clear)
+            .background(
+                isSelected ? Tokens.Color.accent.opacity(0.15) :
+                isActive   ? Tokens.Color.accent.opacity(0.08) :
+                Color.clear
+            )
+            .contentShape(Rectangle())
         }
         .buttonStyle(.plain)
     }

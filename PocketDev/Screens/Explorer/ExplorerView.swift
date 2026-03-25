@@ -14,6 +14,24 @@ struct ExplorerView: View {
     @StateObject private var viewModel: ExplorerViewModel
     @State private var navigateToEditor = false
 
+    // Create item state
+    @State private var showNewItemAlert = false
+    @State private var newItemIsFolder = false
+    @State private var newItemName = ""
+    @State private var newItemParent: URL? = nil
+
+    // Delete state
+    @State private var itemToDelete: FileItem? = nil
+    @State private var showDeleteConfirm = false
+
+    // Folder picker (move / copy)
+    @State private var showFolderPicker = false
+    @State private var isMoveOperation = true
+
+    // Error state
+    @State private var errorMessage = ""
+    @State private var showError = false
+
     init(project: Project) {
         self.project = project
         _viewModel = StateObject(wrappedValue: ExplorerViewModel(
@@ -29,14 +47,65 @@ struct ExplorerView: View {
             VStack(spacing: 0) {
                 PDTopBar(
                     title: project.name,
-                    subtitle: "Explorer",
+                    subtitle: viewModel.isSelecting && !viewModel.selectedURLs.isEmpty
+                        ? "\(viewModel.selectedURLs.count) selected"
+                        : "Explorer",
                     leadingIcon: "chevron.left",
                     leadingAction: { dismiss() }
-                )
+                ) {
+                    HStack(spacing: 0) {
+                        if viewModel.isSelecting {
+                            Button("Cancel") {
+                                viewModel.toggleSelectMode()
+                            }
+                            .font(.system(size: 14))
+                            .foregroundColor(Tokens.Color.accent)
+                            .frame(height: 44)
+                            .padding(.trailing, Tokens.Spacing.sm)
+                        } else {
+                            Button("Select") {
+                                viewModel.toggleSelectMode()
+                            }
+                            .font(.system(size: 14))
+                            .foregroundColor(Tokens.Color.accent)
+                            .frame(height: 44)
+                            .padding(.trailing, Tokens.Spacing.sm)
+
+                            Menu {
+                                Button {
+                                    newItemIsFolder = false
+                                    newItemParent = project.rootURL
+                                    newItemName = ""
+                                    showNewItemAlert = true
+                                } label: {
+                                    Label("New File", systemImage: "doc.badge.plus")
+                                }
+                                Button {
+                                    newItemIsFolder = true
+                                    newItemParent = project.rootURL
+                                    newItemName = ""
+                                    showNewItemAlert = true
+                                } label: {
+                                    Label("New Folder", systemImage: "folder.badge.plus")
+                                }
+                            } label: {
+                                Image(systemName: "plus")
+                                    .font(.system(size: 16, weight: .regular))
+                                    .foregroundColor(Tokens.Color.accent)
+                                    .frame(width: 44, height: 44)
+                                    .contentShape(Rectangle())
+                            }
+                        }
+                    }
+                }
 
                 Divider().background(Tokens.Color.panel)
 
                 content
+
+                if viewModel.isSelecting && !viewModel.selectedURLs.isEmpty {
+                    bulkActionBar
+                }
             }
         }
         .navigationBarHidden(true)
@@ -44,6 +113,141 @@ struct ExplorerView: View {
             EditorContainerView()
         }
         .onAppear { viewModel.load() }
+        .alert(newItemIsFolder ? "New Folder" : "New File", isPresented: $showNewItemAlert) {
+            TextField(newItemIsFolder ? "FolderName" : "filename.swift", text: $newItemName)
+                .autocorrectionDisabled()
+                .textInputAutocapitalization(.never)
+            Button("Create") { commitCreate() }
+            Button("Cancel", role: .cancel) { }
+        }
+        .confirmationDialog(
+            viewModel.isSelecting
+                ? "Delete \(viewModel.selectedURLs.count) item\(viewModel.selectedURLs.count == 1 ? "" : "s")?"
+                : "Delete \"\(itemToDelete?.name ?? "")\"?",
+            isPresented: $showDeleteConfirm,
+            titleVisibility: .visible
+        ) {
+            Button("Delete", role: .destructive) { commitDelete() }
+            Button("Cancel", role: .cancel) { }
+        } message: {
+            Text("This action cannot be undone.")
+        }
+        .alert("Error", isPresented: $showError) {
+            Button("OK", role: .cancel) { }
+        } message: {
+            Text(errorMessage)
+        }
+        .sheet(isPresented: $showFolderPicker) {
+            FolderPickerView(
+                rootURL: project.rootURL,
+                fileService: FileService(),
+                isMoveOperation: isMoveOperation
+            ) { destination in
+                do {
+                    if isMoveOperation {
+                        try viewModel.moveSelected(to: destination)
+                    } else {
+                        try viewModel.copySelected(to: destination)
+                    }
+                } catch {
+                    errorMessage = error.localizedDescription
+                    showError = true
+                }
+            }
+        }
+    }
+
+    // MARK: - Create / Delete actions
+
+    private func commitCreate() {
+        let name = newItemName.trimmingCharacters(in: .whitespaces)
+        guard !name.isEmpty, let parent = newItemParent else { return }
+        do {
+            if newItemIsFolder {
+                try viewModel.createFolder(named: name, in: parent)
+            } else {
+                try viewModel.createFile(named: name, in: parent)
+            }
+        } catch {
+            errorMessage = error.localizedDescription
+            showError = true
+        }
+    }
+
+    private func commitDelete() {
+        if viewModel.isSelecting {
+            do {
+                try viewModel.deleteSelected()
+            } catch {
+                errorMessage = error.localizedDescription
+                showError = true
+            }
+        } else {
+            guard let item = itemToDelete else { return }
+            do {
+                try viewModel.deleteItem(at: item.url)
+            } catch {
+                errorMessage = error.localizedDescription
+                showError = true
+            }
+        }
+    }
+
+    // MARK: - Bulk action bar
+
+    private var bulkActionBar: some View {
+        HStack {
+            Spacer()
+            Button {
+                isMoveOperation = true
+                showFolderPicker = true
+            } label: {
+                VStack(spacing: 4) {
+                    Image(systemName: "folder")
+                        .font(.system(size: 20))
+                    Text("Move")
+                        .font(.system(size: 11))
+                }
+                .foregroundColor(Tokens.Color.accent)
+                .frame(maxWidth: .infinity)
+            }
+            Spacer()
+            Button {
+                isMoveOperation = false
+                showFolderPicker = true
+            } label: {
+                VStack(spacing: 4) {
+                    Image(systemName: "doc.on.doc")
+                        .font(.system(size: 20))
+                    Text("Copy")
+                        .font(.system(size: 11))
+                }
+                .foregroundColor(Tokens.Color.accent)
+                .frame(maxWidth: .infinity)
+            }
+            Spacer()
+            Button {
+                showDeleteConfirm = true
+            } label: {
+                VStack(spacing: 4) {
+                    Image(systemName: "trash")
+                        .font(.system(size: 20))
+                    Text("Delete")
+                        .font(.system(size: 11))
+                }
+                .foregroundColor(Tokens.Color.error)
+                .frame(maxWidth: .infinity)
+            }
+            Spacer()
+        }
+        .padding(.vertical, Tokens.Spacing.md)
+        .background(Tokens.Color.surface)
+        .overlay(
+            Rectangle()
+                .frame(height: 0.5)
+                .foregroundColor(Tokens.Color.panel),
+            alignment: .top
+        )
     }
 
     // MARK: - Content
@@ -92,9 +296,40 @@ struct ExplorerView: View {
                     FileRow(
                         item: node.item,
                         depth: node.depth,
-                        isActive: sessionStore.activeSession?.fileURL == node.item.url
+                        isActive: sessionStore.activeSession?.fileURL == node.item.url,
+                        isSelecting: viewModel.isSelecting,
+                        isSelected: viewModel.selectedURLs.contains(node.item.url)
                     ) {
                         handleTap(node: node)
+                    }
+                    .contextMenu {
+                        if !viewModel.isSelecting {
+                            if node.item.isDirectory {
+                                Button {
+                                    newItemIsFolder = false
+                                    newItemParent = node.item.url
+                                    newItemName = ""
+                                    showNewItemAlert = true
+                                } label: {
+                                    Label("New File", systemImage: "doc.badge.plus")
+                                }
+                                Button {
+                                    newItemIsFolder = true
+                                    newItemParent = node.item.url
+                                    newItemName = ""
+                                    showNewItemAlert = true
+                                } label: {
+                                    Label("New Folder", systemImage: "folder.badge.plus")
+                                }
+                                Divider()
+                            }
+                            Button(role: .destructive) {
+                                itemToDelete = node.item
+                                showDeleteConfirm = true
+                            } label: {
+                                Label("Delete", systemImage: "trash")
+                            }
+                        }
                     }
 
                     Divider()
@@ -108,6 +343,10 @@ struct ExplorerView: View {
     // MARK: - Tap handler
 
     private func handleTap(node: ExplorerNode) {
+        if viewModel.isSelecting {
+            viewModel.toggleSelection(url: node.item.url)
+            return
+        }
         if node.item.isDirectory {
             withAnimation(.easeInOut(duration: Tokens.Motion.micro)) {
                 viewModel.toggle(node: node)
@@ -138,6 +377,8 @@ final class ExplorerViewModel: ObservableObject {
 
     @Published private(set) var state: State = .idle
     @Published private(set) var flatItems: [ExplorerNode] = []
+    @Published private(set) var isSelecting = false
+    @Published private(set) var selectedURLs: Set<URL> = []
 
     private let rootURL: URL
     private let fileService: FileService
@@ -205,6 +446,69 @@ final class ExplorerViewModel: ObservableObject {
         expandedDirs = expandedDirs.filter { !$0.path.hasPrefix(dirURL.path + "/") }
     }
 
+    // MARK: - Selection
+
+    func toggleSelectMode() {
+        isSelecting.toggle()
+        selectedURLs.removeAll()
+    }
+
+    func toggleSelection(url: URL) {
+        if selectedURLs.contains(url) {
+            selectedURLs.remove(url)
+        } else {
+            selectedURLs.insert(url)
+        }
+    }
+
+    // MARK: - Bulk operations
+
+    func deleteSelected() throws {
+        for url in selectedURLs {
+            try fileService.deleteItem(at: url)
+        }
+        isSelecting = false
+        selectedURLs.removeAll()
+        load()
+    }
+
+    func moveSelected(to destination: URL) throws {
+        for url in selectedURLs {
+            try fileService.moveItem(from: url, to: destination)
+        }
+        isSelecting = false
+        selectedURLs.removeAll()
+        load()
+    }
+
+    func copySelected(to destination: URL) throws {
+        for url in selectedURLs {
+            try fileService.copyItem(from: url, to: destination)
+        }
+        isSelecting = false
+        selectedURLs.removeAll()
+        load()
+    }
+
+    // MARK: - Create / Delete
+
+    func createFile(named name: String, in directory: URL) throws {
+        let url = directory.appendingPathComponent(name)
+        try fileService.createFile(at: url)
+        load()
+    }
+
+    func createFolder(named name: String, in directory: URL) throws {
+        let url = directory.appendingPathComponent(name)
+        try fileService.createDirectory(at: url)
+        load()
+    }
+
+    func deleteItem(at url: URL) throws {
+        try fileService.deleteItem(at: url)
+        load()
+    }
+
     // MARK: - Flat list builder
 
     private func buildFlat(items: [FileItem], depth: Int) -> [ExplorerNode] {
@@ -217,5 +521,56 @@ final class ExplorerViewModel: ObservableObject {
             }
         }
         return result
+    }
+}
+
+// MARK: - FolderPickerView
+
+struct FolderPickerView: View {
+    let rootURL: URL
+    let fileService: FileService
+    let isMoveOperation: Bool
+    let onSelect: (URL) -> Void
+
+    @Environment(\.dismiss) private var dismiss
+    @State private var directories: [DirectoryItem] = []
+
+    var body: some View {
+        NavigationStack {
+            List {
+                Button {
+                    onSelect(rootURL)
+                    dismiss()
+                } label: {
+                    Label("/ (project root)", systemImage: "house")
+                        .foregroundColor(Tokens.Color.textPrimary)
+                }
+
+                ForEach(directories) { dir in
+                    Button {
+                        onSelect(dir.url)
+                        dismiss()
+                    } label: {
+                        HStack(spacing: 0) {
+                            if dir.depth > 0 {
+                                Spacer().frame(width: CGFloat(dir.depth) * 20)
+                            }
+                            Label(dir.name, systemImage: "folder")
+                                .foregroundColor(Tokens.Color.textPrimary)
+                        }
+                    }
+                }
+            }
+            .navigationTitle(isMoveOperation ? "Move To" : "Copy To")
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .cancellationAction) {
+                    Button("Cancel") { dismiss() }
+                }
+            }
+        }
+        .onAppear {
+            directories = fileService.allDirectories(in: rootURL)
+        }
     }
 }
