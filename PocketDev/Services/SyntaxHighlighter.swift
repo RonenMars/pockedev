@@ -8,7 +8,7 @@ import UIKit
 
 enum SyntaxHighlighter {
 
-    private static let maxHighlightBytes = 20_000
+    private static let maxHighlightBytes = 100_000
 
     // MARK: - Public API
 
@@ -29,16 +29,19 @@ enum SyntaxHighlighter {
 
     // MARK: - Language
 
-    private enum Language { case swift, javascript, python, json, markdown, plain }
+    private enum Language { case swift, javascript, python, json, markdown, css, html, yaml, plain }
 
     private static func language(for ext: String) -> Language {
         switch ext.lowercased() {
-        case "swift":                       return .swift
-        case "js", "ts", "jsx", "tsx":      return .javascript
-        case "py":                          return .python
-        case "json":                        return .json
-        case "md", "markdown":              return .markdown
-        default:                            return .plain
+        case "swift":                           return .swift
+        case "js", "ts", "jsx", "tsx":          return .javascript
+        case "py":                              return .python
+        case "json":                            return .json
+        case "md", "markdown":                  return .markdown
+        case "css", "scss", "sass", "less":     return .css
+        case "html", "htm", "svelte":           return .html
+        case "yaml", "yml", "lock":             return .yaml
+        default:                                return .plain
         }
     }
 
@@ -63,6 +66,9 @@ enum SyntaxHighlighter {
         case .python:     return pythonPasses
         case .json:       return jsonPasses
         case .markdown:   return markdownPasses
+        case .css:        return cssPasses
+        case .html:       return htmlPasses
+        case .yaml:       return yamlPasses
         case .plain:      return []
         }
     }
@@ -121,8 +127,47 @@ enum SyntaxHighlighter {
         (#"`[^`\n]+`"#,                             C.comment),  // inline code
         (#"\*\*[^*\n]+\*\*"#,                       C.type_),    // bold
         (#"\*[^*\n]+\*"#,                           C.string),   // italic
-        (#"^#{1,6}\s.+"#,                           C.keyword),  // headings
+        (#"^#{1,6}\s[^\n]+"#,                         C.keyword),  // headings
         (#"^```[\s\S]*?^```"#,                      C.comment),  // code fences
+    ])
+
+    // MARK: - CSS / SCSS / Sass / Less
+
+    private static let cssPasses: [Pass] = compile([
+        (#"/\*[\s\S]*?\*/"#,                                                        C.comment),
+        (#"//[^\n]*"#,                                                              C.comment),  // less/scss
+        (#"@[a-zA-Z-]+"#,                                                           C.keyword),  // at-rules (@media, @keyframes…)
+        (#"#[0-9a-fA-F]{3,8}\b"#,                                                  C.number),   // hex colors
+        (#"\b\d+(?:\.\d+)?(?:%|px|em|rem|vh|vw|vmin|vmax|pt|cm|mm|s|ms|deg|fr)?\b"#, C.number),
+        (#"\$[a-zA-Z_][a-zA-Z0-9_-]*"#,                                            C.type_),   // sass/less variables
+        (#":[:]?[a-zA-Z-]+(?:\([^)]*\))?"#,                                        C.type_),   // pseudo-classes & pseudo-elements
+        (#""(?:[^"\\]|\\.)*""#,                                                     C.string),
+        (#"'(?:[^'\\]|\\.)*'"#,                                                     C.string),
+        (#"\b(?:inherit|initial|unset|revert|auto|none|normal|bold|italic|solid|dashed|dotted|flex|grid|block|inline|inline-block|absolute|relative|fixed|sticky|hidden|visible|transparent|currentColor)\b"#, C.keyword),
+    ])
+
+    // MARK: - HTML / HTM / Svelte
+
+    private static let htmlPasses: [Pass] = compile([
+        (#"<!--[\s\S]*?-->"#,                                                       C.comment),
+        (#"</?[a-zA-Z][a-zA-Z0-9:-]*"#,                                            C.keyword),  // open/close tags
+        (#"\b[a-zA-Z-]+=(?:"[^"]*"|'[^']*')"#,                                    C.type_),    // attr=value pairs
+        (#""(?:[^"\\]|\\.)*""#,                                                     C.string),
+        (#"'(?:[^'\\]|\\.)*'"#,                                                     C.string),
+        (#"&(?:[a-zA-Z]+|#\d+|#x[0-9a-fA-F]+);"#,                                 C.number),   // HTML entities
+    ])
+
+    // MARK: - YAML / YML / Lock files
+
+    private static let yamlPasses: [Pass] = compile([
+        (#"#[^\n]*"#,                                                               C.comment),
+        (#"\b\d+(?:\.\d+)?\b"#,                                                    C.number),
+        (#"\b(?:true|false|null|yes|no|on|off|True|False|Null)\b"#,                C.keyword),
+        (#"^[ \t]*[a-zA-Z_][a-zA-Z0-9_./-]*(?=\s*:)"#,                            C.type_),   // keys
+        (#""(?:[^"\\]|\\.)*""#,                                                     C.string),
+        (#"'(?:[^'\\]|\\.)*'"#,                                                     C.string),
+        (#"^[ \t]*-(?= )"#,                                                         C.keyword), // list indicators
+        (#"^---"#,                                                                   C.keyword), // document start
     ])
 
     // MARK: - Regex compiler (errors silently drop the pattern, never crash)
