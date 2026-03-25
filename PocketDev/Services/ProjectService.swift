@@ -57,7 +57,7 @@ final class ProjectService: ObservableObject {
     }
 
     func importProject(at url: URL, name: String) -> Project {
-        if let existing = projects.first(where: { $0.rootPath == url.path }) {
+        if let existing = projects.first(where: { $0.rootPath == url.lastPathComponent }) {
             return existing
         }
         let project = Project(name: name, rootURL: url)
@@ -75,7 +75,7 @@ final class ProjectService: ObservableObject {
         else { return }
 
         // Only include projects whose directory still exists on disk
-        projects = decoded.filter { fileManager.fileExists(atPath: $0.rootPath) }
+        projects = decoded.filter { fileManager.fileExists(atPath: $0.rootURL.path) }
     }
 
     private func save() {

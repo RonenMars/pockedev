@@ -5,15 +5,18 @@ import Foundation
 struct Project: Identifiable, Codable, Hashable {
     let id: UUID
     var name: String
-    let rootPath: String        // stored as path string for Codable simplicity
+    let rootPath: String        // folder name only — full path is resolved at runtime to survive container UUID changes
     let createdAt: Date
 
-    var rootURL: URL { URL(fileURLWithPath: rootPath) }
+    var rootURL: URL {
+        let docs = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first!
+        return docs.appendingPathComponent(rootPath, isDirectory: true)
+    }
 
     init(id: UUID = UUID(), name: String, rootURL: URL) {
         self.id = id
         self.name = name
-        self.rootPath = rootURL.path
+        self.rootPath = rootURL.lastPathComponent
         self.createdAt = Date()
     }
 }
