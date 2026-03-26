@@ -182,6 +182,26 @@ All other functionality uses Apple frameworks: `SwiftUI`, `UIKit`, `Foundation`,
 
 ---
 
+## Changelog
+
+> Everything above this section is the **original README**. The entries below document additions made after the initial write-up.
+
+### Gitty Migration
+
+Replaced the raw `libgit2` Swift Package dependency with **Gitty** (local Swift package at `/Desktop/dev/Gitty`), a purpose-built libgit2 wrapper. Along with the migration, the following capabilities were added:
+
+**New Git features:**
+- Pull (fetch + merge) from remote
+- Per-file diff viewer with syntax-colored additions and deletions (swipe a changed file in GitCommitView)
+- Branch switcher — list local branches, see current branch, and checkout
+
+**Architecture changes:**
+- `GitService.swift` now delegates to Gitty for all Git operations (clone, status, commit, push, pull, diff, branch)
+- Removed `Libgit2Manager.swift` (initialization now handled internally by Gitty)
+- `BranchPickerView` sheet added to ExplorerView screen flow
+
+---
+
 ## License
 
 MIT
