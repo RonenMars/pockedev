@@ -1,0 +1,10 @@
+# macOS
+.DS_Store
+**/.DS_Store
+
+# Xcode user-specific state
+*.xcuserstate
+xcuserdata/
+
+# Swift Package Manager build artifacts
+.build/
