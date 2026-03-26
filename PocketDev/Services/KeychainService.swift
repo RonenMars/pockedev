@@ -7,7 +7,7 @@ import Security
 
 enum KeychainService {
 
-    private static let service = "com.pocketdev.app"
+    private static let service = "com.pockedev.app"
     private static let account = "github.token"
 
     static func saveToken(_ token: String) {

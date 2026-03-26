@@ -6,7 +6,7 @@ import Foundation
 final class ProjectService: ObservableObject {
     @Published private(set) var projects: [Project] = []
 
-    private let storageKey = "pocketdev.projects"
+    private let storageKey = "pockedev.projects"
     private let fileManager = FileManager.default
 
     init() { load() }

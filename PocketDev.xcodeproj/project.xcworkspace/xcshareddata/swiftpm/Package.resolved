@@ -1,13 +1,22 @@
 {
-  "originHash" : "73044a144ea3551ad5735202f446e5172b4ac8b9a72f113a9da9d5a7cad71158",
+  "originHash" : "0e21136473d9a0d4ced6ec772cf0870bd1ffafc581a4a433e6f183d9cc920033",
   "pins" : [
+    {
+      "identity" : "gitty",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/RonenMars/Gitty",
+      "state" : {
+        "revision" : "d1c34befe21c087f206b8c90ce594500d70b813c",
+        "version" : "1.0.0"
+      }
+    },
     {
       "identity" : "libgit2",
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/ibrahimcetin/libgit2",
       "state" : {
-        "revision" : "6e627a8d345d9de7df6f69c134ec5dfa81e75ade",
-        "version" : "1.8.0"
+        "revision" : "52287b0914f300f916b58fec80e13d8dd8f6824f",
+        "version" : "1.9.2"
       }
     }
   ],

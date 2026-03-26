@@ -38,9 +38,11 @@ final class CloneRepoViewModel: ObservableObject {
             }
         }
 
+        var cloneDest: URL?
         do {
             var raw = urlString.trimmingCharacters(in: .whitespaces)
             if raw.hasSuffix("/") { raw = String(raw.dropLast()) }
+            if !raw.hasSuffix(".git") { raw += ".git" }
 
             guard let url = URL(string: raw) else {
                 throw GitCloneError.invalidURL
@@ -48,11 +50,12 @@ final class CloneRepoViewModel: ObservableObject {
 
             let name = url.deletingPathExtension().lastPathComponent
             let dest = try projectService.destinationURL(for: name)
-            let tok: String? = token.trimmingCharacters(in: .whitespaces).isEmpty ? nil : token
+            cloneDest = dest
+            let tok = token.trimmingCharacters(in: .whitespaces)
 
-            try await cloneService.cloneRepository(from: raw, token: tok, to: dest, onProgress: progressHandler)
+            try await cloneService.cloneRepository(from: url, to: dest, token: tok, progress: progressHandler)
 
-            if rememberToken, let tok {
+            if rememberToken && !tok.isEmpty {
                 KeychainService.saveToken(tok)
             } else {
                 KeychainService.deleteToken()
@@ -64,7 +67,12 @@ final class CloneRepoViewModel: ObservableObject {
             completedProject = project
         } catch {
             isCloning = false
-            errorMessage = error.localizedDescription
+            if let gitError = error as? GitCloneError {
+                errorMessage = gitError.errorDescription
+            } else {
+                errorMessage = GitCloneError.from(nsError: error as NSError).errorDescription
+            }
+            if let cloneDest { try? FileManager.default.removeItem(at: cloneDest) }
         }
     }
 }

@@ -32,6 +32,10 @@ struct ExplorerView: View {
     @State private var errorMessage = ""
     @State private var showError = false
 
+    // Git panel
+    @State private var showGitPanel = false
+    @State private var showBranchPicker = false
+
     init(project: Project) {
         self.project = project
         _viewModel = StateObject(wrappedValue: ExplorerViewModel(
@@ -63,6 +67,46 @@ struct ExplorerView: View {
                             .frame(height: 44)
                             .padding(.trailing, Tokens.Spacing.sm)
                         } else {
+                            // Branch button
+                            if viewModel.isGitRepo, let branch = viewModel.currentBranch {
+                                Button {
+                                    showBranchPicker = true
+                                } label: {
+                                    Text(branch)
+                                        .font(.system(size: 11, weight: .medium, design: .monospaced))
+                                        .foregroundColor(Tokens.Color.textSecondary)
+                                        .lineLimit(1)
+                                        .padding(.horizontal, 6)
+                                        .padding(.vertical, 3)
+                                        .background(Tokens.Color.surface, in: Capsule())
+                                }
+                                .padding(.trailing, Tokens.Spacing.xs)
+                            }
+
+                            // Git button
+                            if viewModel.isGitRepo {
+                                Button {
+                                    showGitPanel = true
+                                } label: {
+                                    ZStack(alignment: .topTrailing) {
+                                        Image(systemName: "arrow.triangle.branch")
+                                            .font(.system(size: 16, weight: .regular))
+                                            .foregroundColor(Tokens.Color.accent)
+                                            .frame(width: 36, height: 44)
+
+                                        if viewModel.gitChangedCount > 0 {
+                                            Text("\(viewModel.gitChangedCount)")
+                                                .font(.system(size: 9, weight: .bold))
+                                                .foregroundColor(.white)
+                                                .padding(.horizontal, 3)
+                                                .background(Tokens.Color.error, in: Capsule())
+                                                .offset(x: 4, y: 8)
+                                        }
+                                    }
+                                }
+                                .padding(.trailing, Tokens.Spacing.xs)
+                            }
+
                             Button("Select") {
                                 viewModel.toggleSelectMode()
                             }
@@ -113,6 +157,12 @@ struct ExplorerView: View {
             EditorContainerView()
         }
         .onAppear { viewModel.load() }
+        .sheet(isPresented: $showGitPanel, onDismiss: { viewModel.loadGitStatus() }) {
+            GitCommitView(repoURL: project.rootURL)
+        }
+        .sheet(isPresented: $showBranchPicker, onDismiss: { viewModel.loadGitStatus() }) {
+            BranchPickerView(repoURL: project.rootURL)
+        }
         .alert(newItemIsFolder ? "New Folder" : "New File", isPresented: $showNewItemAlert) {
             TextField(newItemIsFolder ? "FolderName" : "filename.swift", text: $newItemName)
                 .autocorrectionDisabled()
@@ -379,6 +429,9 @@ final class ExplorerViewModel: ObservableObject {
     @Published private(set) var flatItems: [ExplorerNode] = []
     @Published private(set) var isSelecting = false
     @Published private(set) var selectedURLs: Set<URL> = []
+    @Published private(set) var isGitRepo = false
+    @Published private(set) var gitChangedCount = 0
+    @Published private(set) var currentBranch: String? = nil
 
     private let rootURL: URL
     private let fileService: FileService
@@ -414,6 +467,27 @@ final class ExplorerViewModel: ObservableObject {
             } catch {
                 state = .error(error.localizedDescription)
             }
+        }
+        loadGitStatus()
+    }
+
+    func loadGitStatus() {
+        let root = rootURL
+        Task {
+            let gitService = GitRepositoryService(repoURL: root)
+            let isGit = await Task.detached(priority: .background) {
+                gitService.isGitRepository()
+            }.value
+            isGitRepo = isGit
+            guard isGit else { gitChangedCount = 0; currentBranch = nil; return }
+            let count = await Task.detached(priority: .background) {
+                (try? gitService.changedFiles())?.count ?? 0
+            }.value
+            gitChangedCount = count
+            let branch = await Task.detached(priority: .background) {
+                gitService.currentBranch()
+            }.value
+            currentBranch = branch
         }
     }
 

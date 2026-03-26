@@ -70,7 +70,7 @@ struct HomeView: View {
     private var header: some View {
         HStack {
             VStack(alignment: .leading, spacing: 2) {
-                Text("PocketDev")
+                Text("PockeDev")
                     .font(.system(size: 20, weight: .bold))
                     .foregroundColor(Tokens.Color.textPrimary)
                 Text("Local-first code editor")

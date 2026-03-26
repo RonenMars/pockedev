@@ -1,6 +1,6 @@
 name: PocketDev
 options:
-  bundleIdPrefix: com.pocketdev
+  bundleIdPrefix: com.pockedev
   deploymentTarget:
     iOS: "16.0"
   xcodeVersion: "15"
@@ -11,9 +11,9 @@ settings:
   DEVELOPMENT_TEAM: ""
 
 packages:
-  libgit2:
-    url: https://github.com/ibrahimcetin/libgit2
-    exactVersion: "1.8.0"
+  Gitty:
+    url: git@github.com:RonenMars/Gitty.git
+    branch: main
 
 targets:
   PocketDev:
@@ -23,10 +23,10 @@ targets:
     sources:
       - path: PocketDev
     dependencies:
-      - package: libgit2
-        product: libgit2
+      - package: Gitty
+        product: Gitty
     settings:
-      PRODUCT_BUNDLE_IDENTIFIER: com.pocketdev.app
+      PRODUCT_BUNDLE_IDENTIFIER: com.pockedev.app
       INFOPLIST_FILE: PocketDev/Info.plist
       MARKETING_VERSION: "1.0"
       CURRENT_PROJECT_VERSION: "1"
