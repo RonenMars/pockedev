@@ -32,6 +32,9 @@ A native iOS code editor and Git client built with SwiftUI. Edit files, manage p
 - Stage individual files via checkbox selection
 - Commit with author name, email, and message
 - Commit & Push with GitHub Personal Access Token
+- Pull (fetch + merge) from remote
+- Swipe a changed file to view its diff with syntax-colored additions and deletions
+- Branch switcher — list local branches, see current branch, and checkout
 - Token stored securely in the system Keychain (optional auto-save on clone)
 
 ---
@@ -55,10 +58,9 @@ PocketDev/
 ├── Services/
 │   ├── ProjectService.swift       # CRUD + persistence for projects
 │   ├── FileService.swift          # File system operations
-│   ├── GitService.swift           # libgit2 clone, status, commit, push
+│   ├── GitService.swift           # Gitty-backed clone, status, commit, push, pull
 │   ├── KeychainService.swift      # Secure GitHub PAT storage
-│   ├── SyntaxHighlighter.swift    # Regex-based syntax highlighting
-│   └── Libgit2Manager.swift       # One-time libgit2 initialization
+│   └── SyntaxHighlighter.swift    # Regex-based syntax highlighting
 └── Stores/
     └── DocumentSessionStore.swift  # Global tab/session state (@MainActor)
 ```
@@ -69,7 +71,7 @@ PocketDev/
 |---|---|
 | Editor performance | `UITextView` via `UIViewRepresentable` — no SwiftUI text lag |
 | File picker | `UIDocumentPickerViewController` for security-scoped access |
-| Git operations | `libgit2` (Swift Package Manager) for full local Git support |
+| Git operations | `Gitty` (local Swift package, libgit2 wrapper) for full local Git support |
 | Clone thread safety | `actor`-based `GitCloneService` with async progress callbacks |
 | Token security | System Keychain (`Security` framework) |
 | Syntax highlighting | Regex multi-pass, compiled & cached in UITextView coordinator |
@@ -122,8 +124,10 @@ HomeView
     │       ├── TabsBar (horizontal scroll)
     │       ├── CodeEditorView (UITextView)
     │       └── SearchOverlay (slides in from top)
-    └── GitCommitView (sheet)
-        └── File selection + author fields + commit/push buttons
+    ├── GitCommitView (sheet)
+    │   ├── File selection + author fields + commit/push/pull buttons
+    │   └── DiffView (sheet — swipe file row)
+    └── BranchPickerView (sheet)
 ```
 
 ---
@@ -142,7 +146,7 @@ HomeView
 
 | Package | Version | Purpose |
 |---|---|---|
-| [libgit2](https://github.com/libgit2/libgit2) | 1.8.0 (via SPM) | Git clone, status, commit, push |
+| Gitty | local package (`/Desktop/dev/Gitty`) | Git clone, status, commit, push, pull, branch, diff |
 
 All other functionality uses Apple frameworks: `SwiftUI`, `UIKit`, `Foundation`, `Security`, `Combine`.
 
