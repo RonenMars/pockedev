@@ -22,7 +22,7 @@ struct DiffView: View {
                                 .padding(.horizontal, 8)
                             ForEach(hunk.lines.indices, id: \.self) { i in
                                 let line = hunk.lines[i]
-                                Text("\(line.origin) \(line.content)")
+                                Text(String(line.origin) + " " + line.content)
                                     .font(.system(size: 12, design: .monospaced))
                                     .foregroundColor(lineColor(line.origin))
                                     .frame(maxWidth: .infinity, alignment: .leading)

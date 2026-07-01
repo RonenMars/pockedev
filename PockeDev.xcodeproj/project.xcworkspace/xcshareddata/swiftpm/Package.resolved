@@ -1,13 +1,13 @@
 {
-  "originHash" : "0e21136473d9a0d4ced6ec772cf0870bd1ffafc581a4a433e6f183d9cc920033",
+  "originHash" : "789467b778f8a664d0da6c5d951aa7858cc459bc8ecc6af36d24be5aebff714e",
   "pins" : [
     {
       "identity" : "gitty",
       "kind" : "remoteSourceControl",
-      "location" : "https://github.com/RonenMars/Gitty",
+      "location" : "git@github.com:RonenMars/Gitty.git",
       "state" : {
-        "revision" : "d1c34befe21c087f206b8c90ce594500d70b813c",
-        "version" : "1.0.0"
+        "branch" : "main",
+        "revision" : "04eb952eb4005ce211a794dda2f59752fcda6291"
       }
     },
     {

@@ -1,9 +1,9 @@
 
-# DESIGN.md — PocketDev (Refined, Stitch-Optimized)
+# DESIGN.md — PockeDev (Refined, Stitch-Optimized)
 
 ## 0. Design Intent
 
-PocketDev is a **precision mobile developer surface**.
+PockeDev is a **precision mobile developer surface**.
 
 This document refines the design system to align with:
 - UX core principles (clarity, feedback, consistency, affordance)
@@ -424,7 +424,7 @@ If any answer is “no” → iterate.
 
 # 13. Final Experience Definition
 
-PocketDev should feel like:
+PockeDev should feel like:
 
 > a fast, precise, premium engineering tool where every interaction is intentional, every state is clear, and every surface respects the developer’s focus.
 
