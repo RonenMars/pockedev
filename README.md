@@ -1,4 +1,4 @@
-# PocketDev
+# PockeDev
 
 A native iOS code editor and Git client built with SwiftUI. Edit files, manage projects, and commit/push to GitHub — all from your iPhone.
 
@@ -44,7 +44,7 @@ A native iOS code editor and Git client built with SwiftUI. Edit files, manage p
 **Pattern:** SwiftUI + MVVM
 
 ```
-PocketDev/
+PockeDev/
 ├── DesignSystem/           # Design tokens and shared UI components
 │   ├── Tokens.swift        # Colors, spacing, radius, motion constants
 │   └── Components/         # PDButton, PDInput, PDTopBar, PDEmptyState, PDSurface
@@ -156,11 +156,11 @@ All other functionality uses Apple frameworks: `SwiftUI`, `UIKit`, `Foundation`,
 
 1. Clone the repository:
    ```bash
-   git clone https://github.com/your-username/pocket-dev.git
-   cd pocket-dev
+   git clone https://github.com/your-username/pockedev.git
+   cd pockedev
    ```
 
-2. Open `PocketDev.xcodeproj` in Xcode.
+2. Open `PockeDev.xcodeproj` in Xcode.
 
 3. Set a development team in **Signing & Capabilities** (required for Keychain access).
 
@@ -177,7 +177,7 @@ All other functionality uses Apple frameworks: `SwiftUI`, `UIKit`, `Foundation`,
 | Project list | `UserDefaults` (JSON encoded) |
 | Open tabs | In-memory only (not persisted across app launches) |
 | Git author name/email | `UserDefaults` |
-| GitHub PAT | System Keychain (`com.pocketdev.app / github.token`) |
+| GitHub PAT | System Keychain (`com.pockedev.app / github.token`) |
 | File contents | App sandbox `Documents/` directory or user-selected security-scoped URL |
 
 ---
