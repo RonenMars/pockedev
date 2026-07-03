@@ -13,6 +13,10 @@ enum SyntaxHighlighter {
     // MARK: - Public API
 
     static func highlight(text: String, fileExtension: String) -> NSMutableAttributedString {
+        highlight(text: text, language: language(for: fileExtension))
+    }
+
+    static func highlight(text: String, language: Language) -> NSMutableAttributedString {
         let result = NSMutableAttributedString(
             string: text,
             attributes: [
@@ -21,17 +25,32 @@ enum SyntaxHighlighter {
             ]
         )
         guard text.utf16.count <= maxHighlightBytes else { return result }
-        let lang = language(for: fileExtension)
-        guard lang != .plain else { return result }
-        apply(passes: passes(for: lang), to: result)
+        guard language != .plain else { return result }
+        apply(passes: passes(for: language), to: result)
         return result
     }
 
     // MARK: - Language
 
-    private enum Language { case swift, javascript, python, json, markdown, css, html, yaml, plain }
+    enum Language: String, CaseIterable {
+        case swift, javascript, python, json, markdown, css, html, yaml, plain
 
-    private static func language(for ext: String) -> Language {
+        var displayName: String {
+            switch self {
+            case .swift:      return "Swift"
+            case .javascript: return "JavaScript"
+            case .python:     return "Python"
+            case .json:       return "JSON"
+            case .markdown:   return "Markdown"
+            case .css:        return "CSS"
+            case .html:       return "HTML"
+            case .yaml:       return "YAML"
+            case .plain:      return "Plain Text"
+            }
+        }
+    }
+
+    static func language(for ext: String) -> Language {
         switch ext.lowercased() {
         case "swift":                           return .swift
         case "js", "ts", "jsx", "tsx":          return .javascript

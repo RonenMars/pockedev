@@ -16,7 +16,7 @@ import UIKit
 
 struct CodeEditorView: UIViewRepresentable {
     @Binding var text: String
-    var fileExtension: String = ""
+    var language: SyntaxHighlighter.Language = .plain
     var searchMatches: [NSRange] = []
     var activeMatchIndex: Int = 0
     var isEditable: Bool = true
@@ -64,7 +64,7 @@ struct CodeEditorView: UIViewRepresentable {
         guard textView.markedTextRange == nil else { return }
 
         let c = context.coordinator
-        let textChanged    = c.lastText != text || c.lastExtension != fileExtension
+        let textChanged    = c.lastText != text || c.lastLanguage != language
         let searchChanged  = c.lastMatches != searchMatches || c.lastActiveIndex != activeMatchIndex
 
         guard textChanged || searchChanged else {
@@ -75,9 +75,9 @@ struct CodeEditorView: UIViewRepresentable {
 
         // Pass 1 — rebuild syntax cache only when content or language changed
         if textChanged {
-            c.cachedSyntaxAttr = SyntaxHighlighter.highlight(text: text, fileExtension: fileExtension)
+            c.cachedSyntaxAttr = SyntaxHighlighter.highlight(text: text, language: language)
             c.lastText = text
-            c.lastExtension = fileExtension
+            c.lastLanguage = language
         }
 
         guard let base = c.cachedSyntaxAttr else { return }
@@ -153,10 +153,10 @@ struct CodeEditorView: UIViewRepresentable {
     final class Coordinator: NSObject, UITextViewDelegate {
         var onTextChange: ((String) -> Void)?
 
-        // Syntax cache — rebuilt only when text or extension changes
+        // Syntax cache — rebuilt only when text or language changes
         var cachedSyntaxAttr: NSMutableAttributedString? = nil
         var lastText: String? = nil
-        var lastExtension: String? = nil
+        var lastLanguage: SyntaxHighlighter.Language? = nil
 
         // Search state cache — rebuilt when matches or active index changes
         var lastMatches: [NSRange] = []

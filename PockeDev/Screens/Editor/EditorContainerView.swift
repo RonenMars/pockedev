@@ -67,6 +67,24 @@ struct EditorContainerView: View {
             leadingAction: { dismiss() }
         ) {
             HStack(spacing: Tokens.Spacing.sm) {
+                // Syntax language picker
+                if let session = sessionStore.activeSession {
+                    Menu {
+                        Picker("Syntax", selection: languageBinding(for: session)) {
+                            Text("Auto — \(SyntaxHighlighter.language(for: session.fileURL.pathExtension).displayName)")
+                                .tag(nil as SyntaxHighlighter.Language?)
+                            ForEach(SyntaxHighlighter.Language.allCases, id: \.self) { lang in
+                                Text(lang.displayName).tag(lang as SyntaxHighlighter.Language?)
+                            }
+                        }
+                    } label: {
+                        Image(systemName: "curlybraces")
+                            .font(.system(size: 15, weight: .regular))
+                            .foregroundColor(session.languageOverride == nil ? Tokens.Color.textSecondary : Tokens.Color.accent)
+                            .frame(width: 36, height: 44)
+                    }
+                }
+
                 // Search toggle
                 Button {
                     toggleSearch()
@@ -113,7 +131,7 @@ struct EditorContainerView: View {
                             get: { session.content },
                             set: { sessionStore.updateContent($0, sessionID: session.id) }
                         ),
-                        fileExtension: session.fileURL.pathExtension,
+                        language: session.language,
                         searchMatches: searchMatches,
                         activeMatchIndex: currentMatchIndex,
                         onTextChange: { sessionStore.updateContent($0, sessionID: session.id) }
@@ -144,6 +162,15 @@ struct EditorContainerView: View {
                 }
             }
         }
+    }
+
+    // MARK: - Syntax language
+
+    private func languageBinding(for session: DocumentSession) -> Binding<SyntaxHighlighter.Language?> {
+        Binding(
+            get: { session.languageOverride },
+            set: { sessionStore.setLanguage($0, sessionID: session.id) }
+        )
     }
 
     // MARK: - Sub-states

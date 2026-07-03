@@ -11,8 +11,12 @@ struct DocumentSession: Identifiable {
     var isDirty: Bool
     var isLoading: Bool
     var error: String?
+    var languageOverride: SyntaxHighlighter.Language?  // nil = auto-detect from extension
 
     var fileName: String { fileURL.lastPathComponent }
+    var language: SyntaxHighlighter.Language {
+        languageOverride ?? SyntaxHighlighter.language(for: fileURL.pathExtension)
+    }
 
     init(fileURL: URL) {
         self.id = UUID()
@@ -21,5 +25,6 @@ struct DocumentSession: Identifiable {
         self.isDirty = false
         self.isLoading = true
         self.error = nil
+        self.languageOverride = nil
     }
 }

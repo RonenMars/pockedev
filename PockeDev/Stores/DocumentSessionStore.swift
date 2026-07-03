@@ -67,6 +67,12 @@ final class DocumentSessionStore: ObservableObject, @unchecked Sendable {
         }
     }
 
+    func setLanguage(_ language: SyntaxHighlighter.Language?, sessionID: UUID) {
+        mutate(id: sessionID) {
+            $0.languageOverride = language
+        }
+    }
+
     // MARK: - Save
     // Runs the file write on a background thread.
     // Clears isDirty only if content hasn't changed since save was initiated
