@@ -8,3 +8,8 @@ xcuserdata/
 
 # Swift Package Manager build artifacts
 .build/
+
+# Deploy artifacts and signing secrets
+build/
+.env.signing
+*.p8
