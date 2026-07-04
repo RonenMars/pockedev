@@ -119,20 +119,39 @@ struct SearchOverlay: View {
                 .autocorrectionDisabled()
                 .textInputAutocapitalization(.never)
 
-            Button("Replace", action: onReplace)
-                .font(.system(size: 13, weight: .medium))
-                .foregroundColor(hasMatches ? Tokens.Color.accent : Tokens.Color.textSecondary.opacity(0.4))
-                .buttonStyle(.plain)
-                .disabled(!hasMatches)
+            replaceButton(title: "Replace", weight: .medium, action: onReplace)
 
-            Button("All", action: onReplaceAll)
-                .font(.system(size: 13, weight: .semibold))
-                .foregroundColor(hasMatches ? Tokens.Color.accent : Tokens.Color.textSecondary.opacity(0.4))
-                .buttonStyle(.plain)
-                .disabled(!hasMatches)
+            Divider()
+                .frame(height: 20)
+                .background(Tokens.Color.background)
+
+            replaceButton(title: "All", weight: .semibold, action: onReplaceAll)
         }
         .padding(.horizontal, Tokens.Spacing.md)
         .frame(height: 48)
+    }
+
+    // MARK: - Replace buttons
+
+    private func replaceButton(
+        title: String, weight: Font.Weight, action: @escaping () -> Void
+    ) -> some View {
+        Button(action: action) {
+            Text(title)
+                .font(.system(size: 13, weight: weight))
+                .foregroundColor(hasMatches ? Tokens.Color.accent : Tokens.Color.textSecondary.opacity(0.4))
+                .padding(.horizontal, Tokens.Spacing.sm)
+                .frame(height: 30)
+                .background(
+                    RoundedRectangle(cornerRadius: Tokens.Radius.small)
+                        .stroke(
+                            hasMatches ? Tokens.Color.accent.opacity(0.5) : Tokens.Color.textSecondary.opacity(0.2),
+                            lineWidth: 1
+                        )
+                )
+        }
+        .buttonStyle(.plain)
+        .disabled(!hasMatches)
     }
 
     // MARK: - Option toggle
