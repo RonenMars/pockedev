@@ -16,6 +16,7 @@
 		124AE2A3EBD00B8AD0385884 /* BranchPickerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 00E5131D975B6C8D2E6DD759 /* BranchPickerView.swift */; };
 		18FEBEA9EFEA0654EF44C739 /* CloneRepoViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BEDE2A0E7D0EDC11505923E /* CloneRepoViewModel.swift */; };
 		1F1684F0975C90BF64A298DF /* DocumentPickerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0DE52D40CE92EE91ABF186A6 /* DocumentPickerView.swift */; };
+		210AB9D7FA70708ED92787A6 /* FindReplaceEngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = A38B482DA9A8AA8443D2B1C0 /* FindReplaceEngine.swift */; };
 		3343B74F0032A0C7866FA821 /* DocumentSession.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD95492E5DFAB6DC1E86B789 /* DocumentSession.swift */; };
 		37671174047D2AA919DA3A13 /* Tokens.swift in Sources */ = {isa = PBXBuildFile; fileRef = 136B410182754186832778F3 /* Tokens.swift */; };
 		37845C5338C925A3E5F1A74E /* GitService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 465C8A442AD178B9A5BEA2A2 /* GitService.swift */; };
@@ -27,6 +28,7 @@
 		7291BC54FA10E73AF75EF83E /* GitCommitView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9712269B8E08528EEFCFF14C /* GitCommitView.swift */; };
 		76195778866747F0A41FB6B9 /* CloneRepoView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8684B03CA451C2EDEE3E74A /* CloneRepoView.swift */; };
 		7F868F2CCB73430938FE758D /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 460338CC1D5039B28F286658 /* Assets.xcassets */; };
+		8888219D9296B10FB113019A /* FindReplaceEngineTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 085E387AC339944EC81BAD2A /* FindReplaceEngineTests.swift */; };
 		8C5712C72387AEDE3C1760F3 /* Project.swift in Sources */ = {isa = PBXBuildFile; fileRef = 318DD4EB42AF088E860F1F46 /* Project.swift */; };
 		99DCB111243D6DEB2217220C /* PDButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2E6FCAFCF7F6AEBF4C32D57E /* PDButton.swift */; };
 		A06F6FEB546B039E1BC17CB4 /* HomeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 714D8953A6762E06CE9E41F6 /* HomeView.swift */; };
@@ -42,9 +44,20 @@
 		F3D5B131475733551A48A9F8 /* DiffView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D8F6B2DB2259087D8B120602 /* DiffView.swift */; };
 /* End PBXBuildFile section */
 
+/* Begin PBXContainerItemProxy section */
+		736E19E311E95B5CCCA32CA4 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 94D87C8DF1C2D376144AD401 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 9B9AEF0988DD18D935BE0EF8;
+			remoteInfo = PockeDev;
+		};
+/* End PBXContainerItemProxy section */
+
 /* Begin PBXFileReference section */
 		00E5131D975B6C8D2E6DD759 /* BranchPickerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BranchPickerView.swift; sourceTree = "<group>"; };
 		05D54D13176827EB4F03F390 /* CodeEditorView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CodeEditorView.swift; sourceTree = "<group>"; };
+		085E387AC339944EC81BAD2A /* FindReplaceEngineTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FindReplaceEngineTests.swift; sourceTree = "<group>"; };
 		0AADCA2A36A839E8DC836481 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
 		0DE52D40CE92EE91ABF186A6 /* DocumentPickerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DocumentPickerView.swift; sourceTree = "<group>"; };
 		10302C3F18B1F4163B14AD11 /* FileService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FileService.swift; sourceTree = "<group>"; };
@@ -69,6 +82,7 @@
 		843AAC8974562886850BB848 /* KeychainService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeychainService.swift; sourceTree = "<group>"; };
 		8B288481D8FA960411EC31A3 /* DocumentSessionStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DocumentSessionStore.swift; sourceTree = "<group>"; };
 		9712269B8E08528EEFCFF14C /* GitCommitView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GitCommitView.swift; sourceTree = "<group>"; };
+		A38B482DA9A8AA8443D2B1C0 /* FindReplaceEngine.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FindReplaceEngine.swift; sourceTree = "<group>"; };
 		BE71DA2B3DB78C7EA63576E0 /* PDEmptyState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PDEmptyState.swift; sourceTree = "<group>"; };
 		D8F6B2DB2259087D8B120602 /* DiffView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DiffView.swift; sourceTree = "<group>"; };
 		D9F8430654C842D7613C1F34 /* ProjectService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProjectService.swift; sourceTree = "<group>"; };
@@ -76,6 +90,7 @@
 		E0AED91E50041123D7C36BEE /* PDTopBar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PDTopBar.swift; sourceTree = "<group>"; };
 		ED651EB384B52EAEA9153A0C /* NewProjectView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewProjectView.swift; sourceTree = "<group>"; };
 		EDB2CB2C85DDD99FB99B9951 /* FileRow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FileRow.swift; sourceTree = "<group>"; };
+		F65A1E3C30842E2E42AC6AAB /* PockeDevTests.xctest */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.cfbundle; path = PockeDevTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		F8684B03CA451C2EDEE3E74A /* CloneRepoView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CloneRepoView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -91,10 +106,19 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		12521187DE998A5E329613D7 /* PockeDevTests */ = {
+			isa = PBXGroup;
+			children = (
+				085E387AC339944EC81BAD2A /* FindReplaceEngineTests.swift */,
+			);
+			path = PockeDevTests;
+			sourceTree = "<group>";
+		};
 		1DD699927FACDB2455ED333F /* Products */ = {
 			isa = PBXGroup;
 			children = (
 				4E2097B156EE7C87C9BE5218 /* PockeDev.app */,
+				F65A1E3C30842E2E42AC6AAB /* PockeDevTests.xctest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -190,6 +214,7 @@
 			children = (
 				05D54D13176827EB4F03F390 /* CodeEditorView.swift */,
 				21C010ACDAC7867B5CBC3AF8 /* EditorContainerView.swift */,
+				A38B482DA9A8AA8443D2B1C0 /* FindReplaceEngine.swift */,
 				145A74DF2CB6060F5FEDF1AC /* SearchOverlay.swift */,
 				4EBD3AB8B881D3F6285E4BEB /* TabsBar.swift */,
 			);
@@ -211,6 +236,7 @@
 			isa = PBXGroup;
 			children = (
 				86D7C78B5194CDB1CC49DC1C /* PockeDev */,
+				12521187DE998A5E329613D7 /* PockeDevTests */,
 				1DD699927FACDB2455ED333F /* Products */,
 			);
 			sourceTree = "<group>";
@@ -230,6 +256,24 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
+		4BE845080EAF4DCED09437D7 /* PockeDevTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = DAC3D62235BBBDED49A47CA1 /* Build configuration list for PBXNativeTarget "PockeDevTests" */;
+			buildPhases = (
+				D141FB714ADE216E8060E8F7 /* Sources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				52C3AE6CB2D16FF9CA84827E /* PBXTargetDependency */,
+			);
+			name = PockeDevTests;
+			packageProductDependencies = (
+			);
+			productName = PockeDevTests;
+			productReference = F65A1E3C30842E2E42AC6AAB /* PockeDevTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
 		9B9AEF0988DD18D935BE0EF8 /* PockeDev */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = FFACE4D371D96D5E15A5B62E /* Build configuration list for PBXNativeTarget "PockeDev" */;
@@ -259,6 +303,9 @@
 				BuildIndependentTargetsInParallel = YES;
 				LastUpgradeCheck = 1500;
 				TargetAttributes = {
+					4BE845080EAF4DCED09437D7 = {
+						DevelopmentTeam = GUW6BN8X57;
+					};
 					9B9AEF0988DD18D935BE0EF8 = {
 						DevelopmentTeam = GUW6BN8X57;
 					};
@@ -282,6 +329,7 @@
 			projectRoot = "";
 			targets = (
 				9B9AEF0988DD18D935BE0EF8 /* PockeDev */,
+				4BE845080EAF4DCED09437D7 /* PockeDevTests */,
 			);
 		};
 /* End PBXProject section */
@@ -314,6 +362,7 @@
 				092C6944B7258052287081BD /* ExplorerView.swift in Sources */,
 				574B293F1933CC203FF4DB7F /* FileRow.swift in Sources */,
 				0DDFA01E3D88810EE480FEBC /* FileService.swift in Sources */,
+				210AB9D7FA70708ED92787A6 /* FindReplaceEngine.swift in Sources */,
 				02FEC755FB1FB75D23269FC9 /* GitCloneError.swift in Sources */,
 				7291BC54FA10E73AF75EF83E /* GitCommitView.swift in Sources */,
 				B6A65B35E411620F661200F9 /* GitCommitViewModel.swift in Sources */,
@@ -336,7 +385,23 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		D141FB714ADE216E8060E8F7 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				8888219D9296B10FB113019A /* FindReplaceEngineTests.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		52C3AE6CB2D16FF9CA84827E /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 9B9AEF0988DD18D935BE0EF8 /* PockeDev */;
+			targetProxy = 736E19E311E95B5CCCA32CA4 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
 
 /* Begin XCBuildConfiguration section */
 		045027342F23426E890EF39A /* Debug */ = {
@@ -357,6 +422,24 @@
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
 			name = Debug;
+		};
+		2D5EF00245F6A6896E20513F /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.pockedev.app.tests;
+				SDKROOT = iphoneos;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/PockeDev.app/PockeDev";
+			};
+			name = Release;
 		};
 		4B17E5EA708A37ACAD2B39B5 /* Debug */ = {
 			isa = XCBuildConfiguration;
@@ -498,6 +581,24 @@
 			};
 			name = Release;
 		};
+		EE3A3CCB21ADF4A671803167 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.pockedev.app.tests;
+				SDKROOT = iphoneos;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/PockeDev.app/PockeDev";
+			};
+			name = Debug;
+		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
@@ -506,6 +607,15 @@
 			buildConfigurations = (
 				4B17E5EA708A37ACAD2B39B5 /* Debug */,
 				8060A2526AF17ADC943B6E75 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+		DAC3D62235BBBDED49A47CA1 /* Build configuration list for PBXNativeTarget "PockeDevTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				EE3A3CCB21ADF4A671803167 /* Debug */,
+				2D5EF00245F6A6896E20513F /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Debug;

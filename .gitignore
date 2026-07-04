@@ -15,3 +15,6 @@ build/
 scripts/.env.signing-op
 !scripts/.env.signing-op.example
 *.p8
+
+# Superpowers SDD scratch (progress ledger)
+.superpowers/
