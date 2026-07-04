@@ -97,7 +97,8 @@ final class FindReplaceEngineTests: XCTestCase {
         let text = "foo foo"
         let secondFoo = NSRange(location: 4, length: 3)
         let out = FindReplaceEngine.replaceOne(
-            in: text, matchRange: secondFoo, query: "foo", replacement: "bar", isRegex: false
+            in: text, matchRange: secondFoo, query: "foo", replacement: "bar", isRegex: false,
+            caseSensitive: true
         )
         XCTAssertEqual(out, "foo bar")
     }
@@ -107,8 +108,18 @@ final class FindReplaceEngineTests: XCTestCase {
         let range = NSRange(location: 0, length: (text as NSString).length)
         let out = FindReplaceEngine.replaceOne(
             in: text, matchRange: range, query: #"func (\w+)\("#,
-            replacement: "func $1_impl(", isRegex: true
+            replacement: "func $1_impl(", isRegex: true, caseSensitive: true
         )
         XCTAssertEqual(out, "func alpha_impl(")
+    }
+
+    func testReplaceOneRegexCaseInsensitive() {
+        let text = "FUNC foo("
+        let range = NSRange(location: 0, length: (text as NSString).length)
+        let out = FindReplaceEngine.replaceOne(
+            in: text, matchRange: range, query: #"func (\w+)\("#,
+            replacement: "func $1_impl(", isRegex: true, caseSensitive: false
+        )
+        XCTAssertEqual(out, "func foo_impl(")
     }
 }

@@ -81,13 +81,16 @@ enum FindReplaceEngine {
     /// Regex mode resolves `$1`… in `replacement` against that match's captures.
     static func replaceOne(
         in text: String, matchRange: NSRange, query: String,
-        replacement: String, isRegex: Bool
+        replacement: String, isRegex: Bool, caseSensitive: Bool
     ) -> String {
         let nsText = NSMutableString(string: text)
         guard NSMaxRange(matchRange) <= nsText.length else { return text }
 
+        var options: NSRegularExpression.Options = []
+        if !caseSensitive { options.insert(.caseInsensitive) }
+
         let resolved: String
-        if isRegex, let regex = try? NSRegularExpression(pattern: query) {
+        if isRegex, let regex = try? NSRegularExpression(pattern: query, options: options) {
             let matched = nsText.substring(with: matchRange)
             let localRange = NSRange(location: 0, length: (matched as NSString).length)
             resolved = regex.stringByReplacingMatches(
