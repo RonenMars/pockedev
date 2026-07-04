@@ -1,46 +1,97 @@
 import SwiftUI
 
 // MARK: - SearchOverlay (COMPONENT_MAP: SearchOverlay)
-// In-file search only. No replace. No persistence.
+// In-file find & replace. Regex + case toggles. No persistence.
 // DESIGN.md §3.1: overlay for transient tools.
-// DESIGN.md §6.3: fade + slight elevation transition (handled by caller).
 
 struct SearchOverlay: View {
     @Binding var query: String
+    @Binding var replaceText: String
+    @Binding var isRegex: Bool
+    @Binding var isCaseSensitive: Bool
+    @Binding var showReplace: Bool
+
     let matchCount: Int
     let currentIndex: Int       // 0-based; -1 = no matches
+    let isInvalidRegex: Bool
+
     var onNext: () -> Void
     var onPrevious: () -> Void
+    var onReplace: () -> Void
+    var onReplaceAll: () -> Void
     var onDismiss: () -> Void
 
-    @FocusState private var fieldFocused: Bool
+    @FocusState private var findFocused: Bool
 
-    // MARK: - Computed labels
+    private var hasMatches: Bool { matchCount > 0 }
 
     private var matchLabel: String {
         guard !query.isEmpty else { return "" }
+        if isInvalidRegex { return "Invalid regex" }
         if matchCount == 0 { return "No results" }
         return "\(currentIndex + 1) of \(matchCount)"
     }
 
-    private var hasMatches: Bool { matchCount > 0 }
-
-    // MARK: - Body
+    private var matchLabelColor: Color {
+        (isInvalidRegex || matchCount == 0) ? Tokens.Color.error : Tokens.Color.textSecondary
+    }
 
     var body: some View {
-        HStack(spacing: Tokens.Spacing.sm) {
-            searchField
+        VStack(spacing: 0) {
+            findRow
+            if showReplace {
+                Divider().background(Tokens.Color.background)
+                replaceRow
+            }
+        }
+        .background(Tokens.Color.panel)
+        .shadow(color: .black.opacity(0.25), radius: 6, x: 0, y: 3)
+        .onAppear { findFocused = true }
+        .animation(.easeInOut(duration: Tokens.Motion.micro), value: showReplace)
+    }
 
-            Divider()
-                .frame(height: 20)
-                .background(Tokens.Color.panel)
+    // MARK: - Find row
+
+    private var findRow: some View {
+        HStack(spacing: Tokens.Spacing.sm) {
+            Button {
+                showReplace.toggle()
+            } label: {
+                Image(systemName: showReplace ? "chevron.down" : "chevron.right")
+                    .font(.system(size: 12, weight: .semibold))
+                    .foregroundColor(Tokens.Color.textSecondary)
+                    .frame(width: 24, height: 44)
+            }
+            .buttonStyle(.plain)
+
+            Image(systemName: "magnifyingglass")
+                .font(.system(size: 13))
+                .foregroundColor(Tokens.Color.textSecondary)
+
+            TextField("Find in file…", text: $query)
+                .font(.system(size: 14))
+                .foregroundColor(Tokens.Color.textPrimary)
+                .tint(Tokens.Color.accent)
+                .focused($findFocused)
+                .submitLabel(.search)
+                .autocorrectionDisabled()
+                .textInputAutocapitalization(.never)
+                .onSubmit { onNext() }
+
+            if !query.isEmpty {
+                Text(matchLabel)
+                    .font(.system(size: 11, weight: .medium))
+                    .foregroundColor(matchLabelColor)
+                    .fixedSize()
+            }
+
+            toggle(label: ".*", isOn: $isRegex)
+            toggle(label: "Aa", isOn: $isCaseSensitive)
+
+            Divider().frame(height: 20).background(Tokens.Color.background)
 
             navButton(icon: "chevron.up", enabled: hasMatches, action: onPrevious)
             navButton(icon: "chevron.down", enabled: hasMatches, action: onNext)
-
-            Divider()
-                .frame(height: 20)
-                .background(Tokens.Color.panel)
 
             Button("Done", action: onDismiss)
                 .font(.system(size: 14, weight: .medium))
@@ -50,53 +101,59 @@ struct SearchOverlay: View {
         }
         .padding(.horizontal, Tokens.Spacing.md)
         .frame(height: 48)
-        .background(Tokens.Color.panel)
-        .shadow(color: .black.opacity(0.25), radius: 6, x: 0, y: 3)
-        .onAppear { fieldFocused = true }
     }
 
-    // MARK: - Search field
+    // MARK: - Replace row
 
-    private var searchField: some View {
+    private var replaceRow: some View {
         HStack(spacing: Tokens.Spacing.sm) {
-            Image(systemName: "magnifyingglass")
+            Image(systemName: "arrow.2.squarepath")
                 .font(.system(size: 13))
                 .foregroundColor(Tokens.Color.textSecondary)
+                .frame(width: 24)
 
-            TextField("Find in file…", text: $query)
+            TextField(isRegex ? "Replace ($1, $2…)" : "Replace…", text: $replaceText)
                 .font(.system(size: 14))
                 .foregroundColor(Tokens.Color.textPrimary)
                 .tint(Tokens.Color.accent)
-                .focused($fieldFocused)
-                .submitLabel(.search)
                 .autocorrectionDisabled()
                 .textInputAutocapitalization(.never)
-                .onSubmit { onNext() }
 
-            if !query.isEmpty {
-                // Match counter
-                Text(matchLabel)
-                    .font(.system(size: 11, weight: .medium))
-                    .foregroundColor(matchCount == 0 ? Tokens.Color.error : Tokens.Color.textSecondary)
-                    .fixedSize()
-                    .transition(.opacity)
-
-                // Clear
-                Button {
-                    query = ""
-                } label: {
-                    Image(systemName: "xmark.circle.fill")
-                        .font(.system(size: 15))
-                        .foregroundColor(Tokens.Color.textSecondary.opacity(0.7))
-                }
+            Button("Replace", action: onReplace)
+                .font(.system(size: 13, weight: .medium))
+                .foregroundColor(hasMatches ? Tokens.Color.accent : Tokens.Color.textSecondary.opacity(0.4))
                 .buttonStyle(.plain)
-            }
+                .disabled(!hasMatches)
+
+            Button("All", action: onReplaceAll)
+                .font(.system(size: 13, weight: .semibold))
+                .foregroundColor(hasMatches ? Tokens.Color.accent : Tokens.Color.textSecondary.opacity(0.4))
+                .buttonStyle(.plain)
+                .disabled(!hasMatches)
         }
-        .frame(maxWidth: .infinity)
-        .animation(.easeInOut(duration: Tokens.Motion.micro), value: query.isEmpty)
+        .padding(.horizontal, Tokens.Spacing.md)
+        .frame(height: 48)
     }
 
-    // MARK: - Nav buttons (prev / next)
+    // MARK: - Option toggle
+
+    private func toggle(label: String, isOn: Binding<Bool>) -> some View {
+        Button {
+            isOn.wrappedValue.toggle()
+        } label: {
+            Text(label)
+                .font(.system(size: 12, weight: .semibold, design: .monospaced))
+                .foregroundColor(isOn.wrappedValue ? Tokens.Color.accent : Tokens.Color.textSecondary)
+                .frame(width: 28, height: 28)
+                .background(
+                    RoundedRectangle(cornerRadius: Tokens.Radius.small)
+                        .fill(isOn.wrappedValue ? Tokens.Color.accent.opacity(0.15) : Color.clear)
+                )
+        }
+        .buttonStyle(.plain)
+    }
+
+    // MARK: - Nav buttons
 
     private func navButton(icon: String, enabled: Bool, action: @escaping () -> Void) -> some View {
         Button(action: action) {
