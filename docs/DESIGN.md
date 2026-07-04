@@ -199,7 +199,7 @@ Problems to avoid:
 Refinement:
 - minimum touch size: 44pt
 - visible active state
-- close button only on active or hover (future)
+- close button only on active tab (future)
 
 Overflow:
 - horizontal scroll
