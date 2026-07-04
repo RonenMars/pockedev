@@ -56,4 +56,59 @@ final class FindReplaceEngineTests: XCTestCase {
         )
         XCTAssertTrue(r.ranges.isEmpty)
     }
+
+    // MARK: - Replace all
+
+    func testReplaceAllLiteral() {
+        let out = FindReplaceEngine.replaceAll(
+            in: "foo foo", query: "foo", replacement: "bar",
+            isRegex: false, caseSensitive: false
+        )
+        XCTAssertEqual(out, "bar bar")
+    }
+
+    func testReplaceAllRegexCaptureTemplate() {
+        let out = FindReplaceEngine.replaceAll(
+            in: "func alpha(", query: #"func (\w+)\("#, replacement: "func $1_impl(",
+            isRegex: true, caseSensitive: false
+        )
+        XCTAssertEqual(out, "func alpha_impl(")
+    }
+
+    func testReplaceAllEmptyDeletes() {
+        let out = FindReplaceEngine.replaceAll(
+            in: "a-b-c", query: "-", replacement: "",
+            isRegex: false, caseSensitive: false
+        )
+        XCTAssertEqual(out, "abc")
+    }
+
+    func testReplaceAllInvalidRegexReturnsUnchanged() {
+        let out = FindReplaceEngine.replaceAll(
+            in: "func (", query: "func (", replacement: "x",
+            isRegex: true, caseSensitive: false
+        )
+        XCTAssertEqual(out, "func (")
+    }
+
+    // MARK: - Replace one
+
+    func testReplaceOneLiteralAtRange() {
+        let text = "foo foo"
+        let secondFoo = NSRange(location: 4, length: 3)
+        let out = FindReplaceEngine.replaceOne(
+            in: text, matchRange: secondFoo, query: "foo", replacement: "bar", isRegex: false
+        )
+        XCTAssertEqual(out, "foo bar")
+    }
+
+    func testReplaceOneRegexTemplateAtRange() {
+        let text = "func alpha("
+        let range = NSRange(location: 0, length: (text as NSString).length)
+        let out = FindReplaceEngine.replaceOne(
+            in: text, matchRange: range, query: #"func (\w+)\("#,
+            replacement: "func $1_impl(", isRegex: true
+        )
+        XCTAssertEqual(out, "func alpha_impl(")
+    }
 }
