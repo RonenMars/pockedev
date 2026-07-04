@@ -18,6 +18,11 @@ struct EditorContainerView: View {
     @State private var searchQuery = ""
     @State private var searchMatches: [NSRange] = []
     @State private var currentMatchIndex = 0
+    @State private var replaceText = ""
+    @State private var isRegex = false
+    @State private var isCaseSensitive = false
+    @State private var showReplace = false
+    @State private var isInvalidRegex = false
 
     var body: some View {
         ZStack {
@@ -141,11 +146,18 @@ struct EditorContainerView: View {
                     if showSearch {
                         SearchOverlay(
                             query: $searchQuery,
+                            replaceText: $replaceText,
+                            isRegex: $isRegex,
+                            isCaseSensitive: $isCaseSensitive,
+                            showReplace: $showReplace,
                             matchCount: searchMatches.count,
                             currentIndex: currentMatchIndex,
-                            onNext:     { navigateMatch(direction: .next) },
-                            onPrevious: { navigateMatch(direction: .previous) },
-                            onDismiss:  { dismissSearch() }
+                            isInvalidRegex: isInvalidRegex,
+                            onNext:       { navigateMatch(direction: .next) },
+                            onPrevious:   { navigateMatch(direction: .previous) },
+                            onReplace:    { performReplace() },
+                            onReplaceAll: { performReplaceAll() },
+                            onDismiss:    { dismissSearch() }
                         )
                         .transition(.move(edge: .top).combined(with: .opacity))
                     }
@@ -160,6 +172,8 @@ struct EditorContainerView: View {
                     guard showSearch else { return }
                     recomputeMatches()
                 }
+                .onChange(of: isRegex) { _ in recomputeMatches() }
+                .onChange(of: isCaseSensitive) { _ in recomputeMatches() }
             }
         }
     }
@@ -267,8 +281,11 @@ struct EditorContainerView: View {
     private func dismissSearch() {
         showSearch = false
         searchQuery = ""
+        replaceText = ""
         searchMatches = []
         currentMatchIndex = 0
+        showReplace = false
+        isInvalidRegex = false
     }
 
     private func recomputeMatches() {
@@ -276,15 +293,20 @@ struct EditorContainerView: View {
               let content = sessionStore.activeSession?.content else {
             searchMatches = []
             currentMatchIndex = 0
+            isInvalidRegex = false
             return
         }
 
-        searchMatches = findMatches(in: content, query: searchQuery)
+        let result = FindReplaceEngine.matches(
+            in: content, query: searchQuery,
+            isRegex: isRegex, caseSensitive: isCaseSensitive
+        )
+        isInvalidRegex = result.isInvalidRegex
+        searchMatches = result.ranges
 
         if searchMatches.isEmpty {
             currentMatchIndex = 0
         } else {
-            // Clamp index so position is preserved across content edits and tab switches
             currentMatchIndex = min(currentMatchIndex, searchMatches.count - 1)
         }
     }
@@ -301,21 +323,26 @@ struct EditorContainerView: View {
         }
     }
 
-    // MARK: - Match computation
+    private func performReplace() {
+        guard let session = sessionStore.activeSession,
+              !searchMatches.isEmpty,
+              currentMatchIndex < searchMatches.count else { return }
+        let range = searchMatches[currentMatchIndex]
+        let updated = FindReplaceEngine.replaceOne(
+            in: session.content, matchRange: range, query: searchQuery,
+            replacement: replaceText, isRegex: isRegex, caseSensitive: isCaseSensitive
+        )
+        sessionStore.updateContent(updated, sessionID: session.id)
+        recomputeMatches()
+    }
 
-    /// Case-insensitive forward search. Returns all NSRange matches in order.
-    private func findMatches(in text: String, query: String) -> [NSRange] {
-        guard !query.isEmpty else { return [] }
-        var results: [NSRange] = []
-        let nsText = text as NSString
-        var searchFrom = NSRange(location: 0, length: nsText.length)
-        while searchFrom.location < nsText.length {
-            let found = nsText.range(of: query, options: .caseInsensitive, range: searchFrom)
-            guard found.location != NSNotFound else { break }
-            results.append(found)
-            let next = found.location + found.length
-            searchFrom = NSRange(location: next, length: nsText.length - next)
-        }
-        return results
+    private func performReplaceAll() {
+        guard let session = sessionStore.activeSession, !searchMatches.isEmpty else { return }
+        let updated = FindReplaceEngine.replaceAll(
+            in: session.content, query: searchQuery, replacement: replaceText,
+            isRegex: isRegex, caseSensitive: isCaseSensitive
+        )
+        sessionStore.updateContent(updated, sessionID: session.id)
+        recomputeMatches()
     }
 }
