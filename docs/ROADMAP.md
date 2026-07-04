@@ -60,3 +60,4 @@ Three "why reach for PockeDev on a phone" moments, in build priority. **AI pair-
 | 40 | On-device code execution / runtime | Run code on-device (blocked by Apple sandbox — see through-line) | Automation | Feature | Unprioritized | XL | — |
 | 41 | Drag-and-drop native UI builder | Visual drag-and-drop UI builder | Automation | Feature | Unprioritized | XL | — |
 | 42 | Extensions / plugin ecosystem | Third-party extensions / plugins | Ecosystem | Feature | Unprioritized | XL | — |
+| 43 | Local snapshot store | Per-file local revision history: snapshot content on save, browse/preview/restore past versions from a history sheet, and tag a snapshot with a name/label. Independent of Git; works offline and for non-repo files. | Editor | Feature | Unprioritized | L | — |
