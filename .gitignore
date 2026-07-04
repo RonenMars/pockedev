@@ -12,4 +12,6 @@ xcuserdata/
 # Deploy artifacts and signing secrets
 build/
 .env.signing
+scripts/.env.signing-op
+!scripts/.env.signing-op.example
 *.p8

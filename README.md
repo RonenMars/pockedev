@@ -170,6 +170,19 @@ All other functionality uses Apple frameworks: `SwiftUI`, `UIKit`, `Foundation`,
 
 ---
 
+## Deploy
+
+Ship to TestFlight with the pipeline in [`scripts/`](scripts):
+
+```bash
+source .env.signing
+./scripts/ship-ios.sh
+```
+
+See [`docs/DEPLOY.md`](docs/DEPLOY.md) for one-time signing setup (including the 1Password bootstrap) and the full flow.
+
+---
+
 ## Data Storage
 
 | Data | Storage |
