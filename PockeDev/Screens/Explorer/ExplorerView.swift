@@ -435,6 +435,9 @@ final class ExplorerViewModel: ObservableObject {
 
     private let rootURL: URL
     private let fileService: FileService
+    // Held for the Explorer session so child listings/opens inherit access
+    // from a document-picker folder URL.
+    private let securityScope: SecurityScopedAccess
 
     // Expansion state keyed by rootURL — survives view recreation when user
     // navigates back to Home and re-enters the same project.
@@ -449,11 +452,13 @@ final class ExplorerViewModel: ObservableObject {
     init(rootURL: URL, fileService: FileService) {
         self.rootURL = rootURL
         self.fileService = fileService
+        self.securityScope = SecurityScopedAccess(url: rootURL)
     }
 
     // MARK: - Load
 
     func load() {
+        _ = securityScope
         state = .loading
         Task {
             do {
@@ -645,6 +650,26 @@ struct FolderPickerView: View {
         }
         .onAppear {
             directories = fileService.allDirectories(in: rootURL)
+        }
+    }
+}
+
+// MARK: - SecurityScopedAccess
+
+/// Keeps a security-scoped URL accessible until deallocated.
+/// Isolated from ExplorerViewModel so deinit is not MainActor-bound.
+private final class SecurityScopedAccess: @unchecked Sendable {
+    private let url: URL
+    private let accessed: Bool
+
+    init(url: URL) {
+        self.url = url
+        self.accessed = url.startAccessingSecurityScopedResource()
+    }
+
+    deinit {
+        if accessed {
+            url.stopAccessingSecurityScopedResource()
         }
     }
 }

@@ -41,6 +41,9 @@ struct DocumentPickerView: UIViewControllerRepresentable {
 
         func documentPicker(_ controller: UIDocumentPickerViewController, didPickDocumentsAt urls: [URL]) {
             guard let url = urls.first else { return }
+            // Access must start in this callback — after the picker dismisses,
+            // an un-accessed security-scoped URL can fail with "no such file".
+            _ = url.startAccessingSecurityScopedResource()
             onPick(url)
         }
 
