@@ -2,7 +2,7 @@ import SwiftUI
 
 // MARK: - EditorContainerView (UI_SPEC: Editor)
 // States: loading, error, editing
-// Features: TabsBar, CodeEditorView, Save, Search overlay
+// Features: TabsBar, CodeEditorView, Markdown preview, Save, Search overlay
 // DESIGN.md §2.2: Editor ≥ 80% of screen.
 
 struct EditorContainerView: View {
@@ -23,6 +23,7 @@ struct EditorContainerView: View {
     @State private var isCaseSensitive = false
     @State private var showReplace = false
     @State private var isInvalidRegex = false
+    @State private var showMarkdownPreview = false
 
     var body: some View {
         ZStack {
@@ -59,6 +60,14 @@ struct EditorContainerView: View {
         // Recompute matches when the active tab changes
         .onChange(of: sessionStore.activeSessionID) { _ in
             recomputeMatches()
+            if sessionStore.activeSession?.language != .markdown {
+                showMarkdownPreview = false
+            }
+        }
+        .onChange(of: sessionStore.activeSession?.language) { language in
+            if language != .markdown {
+                showMarkdownPreview = false
+            }
         }
     }
 
@@ -90,6 +99,23 @@ struct EditorContainerView: View {
                     }
                 }
 
+                // Markdown preview (only when the active file is Markdown)
+                if sessionStore.activeSession?.language == .markdown {
+                    Button {
+                        withAnimation(.easeInOut(duration: Tokens.Motion.normal)) {
+                            showMarkdownPreview.toggle()
+                            if showMarkdownPreview { dismissSearch() }
+                        }
+                    } label: {
+                        Image(systemName: showMarkdownPreview ? "pencil" : "eye")
+                            .font(.system(size: 15, weight: .regular))
+                            .foregroundColor(showMarkdownPreview ? Tokens.Color.accent : Tokens.Color.textSecondary)
+                            .frame(width: 36, height: 44)
+                    }
+                    .buttonStyle(.plain)
+                    .accessibilityLabel(showMarkdownPreview ? "Show Markdown source" : "Preview Markdown")
+                }
+
                 // Search toggle
                 Button {
                     toggleSearch()
@@ -100,7 +126,7 @@ struct EditorContainerView: View {
                         .frame(width: 36, height: 44)
                 }
                 .buttonStyle(.plain)
-                .disabled(sessionStore.activeSession == nil)
+                .disabled(sessionStore.activeSession == nil || showMarkdownPreview)
 
                 // Save
                 if let session = sessionStore.activeSession {
@@ -129,6 +155,8 @@ struct EditorContainerView: View {
                 loadingView
             } else if let error = session.error {
                 errorView(message: error, sessionID: session.id)
+            } else if showMarkdownPreview && session.language == .markdown {
+                MarkdownPreviewView(markdown: session.content)
             } else {
                 ZStack(alignment: .top) {
                     CodeEditorView(
