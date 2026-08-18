@@ -14,12 +14,14 @@
 		0D0D9135BF836E329150C1F5 /* PDEmptyState.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE71DA2B3DB78C7EA63576E0 /* PDEmptyState.swift */; };
 		0DDFA01E3D88810EE480FEBC /* FileService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10302C3F18B1F4163B14AD11 /* FileService.swift */; };
 		124AE2A3EBD00B8AD0385884 /* BranchPickerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 00E5131D975B6C8D2E6DD759 /* BranchPickerView.swift */; };
+		12D52EBE4A448F550A7AE9A6 /* MarkdownPreviewView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53AD0B70AAF37CC1F33F1C50 /* MarkdownPreviewView.swift */; };
 		18FEBEA9EFEA0654EF44C739 /* CloneRepoViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BEDE2A0E7D0EDC11505923E /* CloneRepoViewModel.swift */; };
 		1F1684F0975C90BF64A298DF /* DocumentPickerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0DE52D40CE92EE91ABF186A6 /* DocumentPickerView.swift */; };
 		210AB9D7FA70708ED92787A6 /* FindReplaceEngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = A38B482DA9A8AA8443D2B1C0 /* FindReplaceEngine.swift */; };
 		3343B74F0032A0C7866FA821 /* DocumentSession.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD95492E5DFAB6DC1E86B789 /* DocumentSession.swift */; };
 		37671174047D2AA919DA3A13 /* Tokens.swift in Sources */ = {isa = PBXBuildFile; fileRef = 136B410182754186832778F3 /* Tokens.swift */; };
 		37845C5338C925A3E5F1A74E /* GitService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 465C8A442AD178B9A5BEA2A2 /* GitService.swift */; };
+		3B9DE231B3EB3A644EDCC6C5 /* MarkdownRendererTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 09EE625452AAFE84138D4C89 /* MarkdownRendererTests.swift */; };
 		574B293F1933CC203FF4DB7F /* FileRow.swift in Sources */ = {isa = PBXBuildFile; fileRef = EDB2CB2C85DDD99FB99B9951 /* FileRow.swift */; };
 		59DDB2C954E2A674AEF81B47 /* ProjectService.swift in Sources */ = {isa = PBXBuildFile; fileRef = D9F8430654C842D7613C1F34 /* ProjectService.swift */; };
 		624195EA91EBDB81BC23B257 /* CodeEditorView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05D54D13176827EB4F03F390 /* CodeEditorView.swift */; };
@@ -29,17 +31,16 @@
 		7291BC54FA10E73AF75EF83E /* GitCommitView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9712269B8E08528EEFCFF14C /* GitCommitView.swift */; };
 		76195778866747F0A41FB6B9 /* CloneRepoView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8684B03CA451C2EDEE3E74A /* CloneRepoView.swift */; };
 		7F868F2CCB73430938FE758D /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 460338CC1D5039B28F286658 /* Assets.xcassets */; };
-		1A7C3E59D0B24F8A9C6E1D42 /* MarkdownRenderer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F2A18C4B7E046D1A3C58E70 /* MarkdownRenderer.swift */; };
-		6E0F9A2C4B8D15E73A91C0D4 /* MarkdownPreviewView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B8D21E0C6A347F19E5B0D83 /* MarkdownPreviewView.swift */; };
 		8888219D9296B10FB113019A /* FindReplaceEngineTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 085E387AC339944EC81BAD2A /* FindReplaceEngineTests.swift */; };
-		8A1B4C7D0E2F3956A8B1C4D7 /* MarkdownRendererTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2C5D8E1A9B4F3076C0D2A8E5 /* MarkdownRendererTests.swift */; };
 		8C5712C72387AEDE3C1760F3 /* Project.swift in Sources */ = {isa = PBXBuildFile; fileRef = 318DD4EB42AF088E860F1F46 /* Project.swift */; };
+		90F358315E801F357619D979 /* Markdown in Frameworks */ = {isa = PBXBuildFile; productRef = 83C790E4DE826969475AEC10 /* Markdown */; };
 		99DCB111243D6DEB2217220C /* PDButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2E6FCAFCF7F6AEBF4C32D57E /* PDButton.swift */; };
 		A06F6FEB546B039E1BC17CB4 /* HomeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 714D8953A6762E06CE9E41F6 /* HomeView.swift */; };
 		ADFA8A845615281E0ADA4FE6 /* TabsBar.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4EBD3AB8B881D3F6285E4BEB /* TabsBar.swift */; };
 		B4A34D90F21511FA9B4D0FE3 /* KeychainService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 843AAC8974562886850BB848 /* KeychainService.swift */; };
 		B6A65B35E411620F661200F9 /* GitCommitViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7195B10048C5D5EE6D0A12C2 /* GitCommitViewModel.swift */; };
 		B98D6136DB04ACE99F66AA33 /* SyntaxHighlighter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6B18AC57445A6C375CE0BED9 /* SyntaxHighlighter.swift */; };
+		C158AE6689276B32F94DE742 /* MarkdownRenderer.swift in Sources */ = {isa = PBXBuildFile; fileRef = EA0B0F70CA16F4C2ECD02D47 /* MarkdownRenderer.swift */; };
 		C34138DB0DEF0226D01ACE85 /* PDSurface.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6212D5268AD4F317B9E70F27 /* PDSurface.swift */; };
 		E133F3C9679011C08694A760 /* EditorContainerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 21C010ACDAC7867B5CBC3AF8 /* EditorContainerView.swift */; };
 		E1E9453EE4098BF55405343B /* Gitty in Frameworks */ = {isa = PBXBuildFile; productRef = 6CEBE2D206D599B96C3D66A2 /* Gitty */; };
@@ -63,9 +64,7 @@
 		00E5131D975B6C8D2E6DD759 /* BranchPickerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BranchPickerView.swift; sourceTree = "<group>"; };
 		05D54D13176827EB4F03F390 /* CodeEditorView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CodeEditorView.swift; sourceTree = "<group>"; };
 		085E387AC339944EC81BAD2A /* FindReplaceEngineTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FindReplaceEngineTests.swift; sourceTree = "<group>"; };
-		2C5D8E1A9B4F3076C0D2A8E5 /* MarkdownRendererTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MarkdownRendererTests.swift; sourceTree = "<group>"; };
-		4B8D21E0C6A347F19E5B0D83 /* MarkdownPreviewView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MarkdownPreviewView.swift; sourceTree = "<group>"; };
-		9F2A18C4B7E046D1A3C58E70 /* MarkdownRenderer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MarkdownRenderer.swift; sourceTree = "<group>"; };
+		09EE625452AAFE84138D4C89 /* MarkdownRendererTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MarkdownRendererTests.swift; sourceTree = "<group>"; };
 		0AADCA2A36A839E8DC836481 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
 		0DE52D40CE92EE91ABF186A6 /* DocumentPickerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DocumentPickerView.swift; sourceTree = "<group>"; };
 		10302C3F18B1F4163B14AD11 /* FileService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FileService.swift; sourceTree = "<group>"; };
@@ -82,6 +81,7 @@
 		4EA0A8D4F8BBDB4DD6B686DE /* GitCloneError.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GitCloneError.swift; sourceTree = "<group>"; };
 		4EBD3AB8B881D3F6285E4BEB /* TabsBar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TabsBar.swift; sourceTree = "<group>"; };
 		4FB67B8DEB945EE059EC43DB /* PockeDevApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PockeDevApp.swift; sourceTree = "<group>"; };
+		53AD0B70AAF37CC1F33F1C50 /* MarkdownPreviewView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MarkdownPreviewView.swift; sourceTree = "<group>"; };
 		5BEDE2A0E7D0EDC11505923E /* CloneRepoViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CloneRepoViewModel.swift; sourceTree = "<group>"; };
 		6131CBA1D7BF97D1A2E85144 /* ExplorerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExplorerView.swift; sourceTree = "<group>"; };
 		6212D5268AD4F317B9E70F27 /* PDSurface.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PDSurface.swift; sourceTree = "<group>"; };
@@ -97,6 +97,7 @@
 		D9F8430654C842D7613C1F34 /* ProjectService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProjectService.swift; sourceTree = "<group>"; };
 		DD95492E5DFAB6DC1E86B789 /* DocumentSession.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DocumentSession.swift; sourceTree = "<group>"; };
 		E0AED91E50041123D7C36BEE /* PDTopBar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PDTopBar.swift; sourceTree = "<group>"; };
+		EA0B0F70CA16F4C2ECD02D47 /* MarkdownRenderer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MarkdownRenderer.swift; sourceTree = "<group>"; };
 		ED651EB384B52EAEA9153A0C /* NewProjectView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewProjectView.swift; sourceTree = "<group>"; };
 		EDB2CB2C85DDD99FB99B9951 /* FileRow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FileRow.swift; sourceTree = "<group>"; };
 		F65A1E3C30842E2E42AC6AAB /* PockeDevTests.xctest */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.cfbundle; path = PockeDevTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -110,6 +111,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				E1E9453EE4098BF55405343B /* Gitty in Frameworks */,
+				90F358315E801F357619D979 /* Markdown in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -121,7 +123,7 @@
 			children = (
 				2771780BE94769C177812889 /* FileServiceTests.swift */,
 				085E387AC339944EC81BAD2A /* FindReplaceEngineTests.swift */,
-				2C5D8E1A9B4F3076C0D2A8E5 /* MarkdownRendererTests.swift */,
+				09EE625452AAFE84138D4C89 /* MarkdownRendererTests.swift */,
 				F7D764D93D6680A7DF1FF641 /* ProjectTests.swift */,
 			);
 			path = PockeDevTests;
@@ -208,9 +210,9 @@
 				4EA0A8D4F8BBDB4DD6B686DE /* GitCloneError.swift */,
 				465C8A442AD178B9A5BEA2A2 /* GitService.swift */,
 				843AAC8974562886850BB848 /* KeychainService.swift */,
+				EA0B0F70CA16F4C2ECD02D47 /* MarkdownRenderer.swift */,
 				D9F8430654C842D7613C1F34 /* ProjectService.swift */,
 				6B18AC57445A6C375CE0BED9 /* SyntaxHighlighter.swift */,
-				9F2A18C4B7E046D1A3C58E70 /* MarkdownRenderer.swift */,
 			);
 			path = Services;
 			sourceTree = "<group>";
@@ -229,7 +231,7 @@
 				05D54D13176827EB4F03F390 /* CodeEditorView.swift */,
 				21C010ACDAC7867B5CBC3AF8 /* EditorContainerView.swift */,
 				A38B482DA9A8AA8443D2B1C0 /* FindReplaceEngine.swift */,
-				4B8D21E0C6A347F19E5B0D83 /* MarkdownPreviewView.swift */,
+				53AD0B70AAF37CC1F33F1C50 /* MarkdownPreviewView.swift */,
 				145A74DF2CB6060F5FEDF1AC /* SearchOverlay.swift */,
 				4EBD3AB8B881D3F6285E4BEB /* TabsBar.swift */,
 			);
@@ -304,6 +306,7 @@
 			name = PockeDev;
 			packageProductDependencies = (
 				6CEBE2D206D599B96C3D66A2 /* Gitty */,
+				83C790E4DE826969475AEC10 /* Markdown */,
 			);
 			productName = PockeDev;
 			productReference = 4E2097B156EE7C87C9BE5218 /* PockeDev.app */;
@@ -337,6 +340,7 @@
 			minimizedProjectReferenceProxies = 1;
 			packageReferences = (
 				1D71E2A859C93AEBC30F64AA /* XCRemoteSwiftPackageReference "Gitty" */,
+				7C341197D565B038C72A561C /* XCRemoteSwiftPackageReference "swift-markdown" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 1DD699927FACDB2455ED333F /* Products */;
@@ -384,8 +388,8 @@
 				37845C5338C925A3E5F1A74E /* GitService.swift in Sources */,
 				A06F6FEB546B039E1BC17CB4 /* HomeView.swift in Sources */,
 				B4A34D90F21511FA9B4D0FE3 /* KeychainService.swift in Sources */,
-				6E0F9A2C4B8D15E73A91C0D4 /* MarkdownPreviewView.swift in Sources */,
-				1A7C3E59D0B24F8A9C6E1D42 /* MarkdownRenderer.swift in Sources */,
+				12D52EBE4A448F550A7AE9A6 /* MarkdownPreviewView.swift in Sources */,
+				C158AE6689276B32F94DE742 /* MarkdownRenderer.swift in Sources */,
 				70EE5B578907A05800276A75 /* NewProjectView.swift in Sources */,
 				99DCB111243D6DEB2217220C /* PDButton.swift in Sources */,
 				0D0D9135BF836E329150C1F5 /* PDEmptyState.swift in Sources */,
@@ -408,7 +412,7 @@
 			files = (
 				F4F136D7EAE04AF83EA88352 /* FileServiceTests.swift in Sources */,
 				8888219D9296B10FB113019A /* FindReplaceEngineTests.swift in Sources */,
-				8A1B4C7D0E2F3956A8B1C4D7 /* MarkdownRendererTests.swift in Sources */,
+				3B9DE231B3EB3A644EDCC6C5 /* MarkdownRendererTests.swift in Sources */,
 				63A6C73DE57086E3DC532156 /* ProjectTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -660,6 +664,14 @@
 				kind = branch;
 			};
 		};
+		7C341197D565B038C72A561C /* XCRemoteSwiftPackageReference "swift-markdown" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/swiftlang/swift-markdown.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 0.8.0;
+			};
+		};
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
@@ -667,6 +679,11 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 1D71E2A859C93AEBC30F64AA /* XCRemoteSwiftPackageReference "Gitty" */;
 			productName = Gitty;
+		};
+		83C790E4DE826969475AEC10 /* Markdown */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 7C341197D565B038C72A561C /* XCRemoteSwiftPackageReference "swift-markdown" */;
+			productName = Markdown;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};

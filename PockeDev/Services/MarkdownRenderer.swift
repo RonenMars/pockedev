@@ -1,10 +1,11 @@
 import Foundation
+import Markdown
 import UIKit
 
 // MARK: - MarkdownRenderer
-// Converts Markdown source into a dark-theme NSAttributedString using Foundation's
-// Markdown parser (presentation intents). Syntax characters are stripped; headings,
-// emphasis, lists, quotes, and code are styled for a read-only preview.
+// Converts Markdown source into a dark-theme NSAttributedString using swift-markdown
+// (cmark-gfm). The parser yields a Markup tree; this renderer walks it and applies
+// GitHub-like preview styles for a read-only editor preview.
 
 enum MarkdownRenderer {
 
@@ -17,38 +18,21 @@ enum MarkdownRenderer {
             return plain(markdown)
         }
 
-        let options = AttributedString.MarkdownParsingOptions(
-            interpretedSyntax: .full,
-            failurePolicy: .returnPartiallyParsedIfPossible
-        )
-
-        let parsed: AttributedString
-        do {
-            parsed = try AttributedString(markdown: markdown, options: options)
-        } catch {
-            return plain(markdown)
-        }
-
-        let result = NSMutableAttributedString(parsed)
-        guard result.length > 0 else { return result }
-
-        applyBaseAttributes(to: result)
-        applyRunStyles(to: result)
-        insertListMarkers(into: result)
-        return result
+        var visitor = PreviewVisitor()
+        return visitor.visit(Document(parsing: markdown))
     }
 
     // MARK: - Colors / fonts (match Tokens.swift)
 
-    private enum C {
+    fileprivate enum C {
         static let textPrimary   = UIColor(red: 0.90, green: 0.93, blue: 0.95, alpha: 1) // #E6EDF3
         static let textSecondary = UIColor(red: 0.62, green: 0.65, blue: 0.70, alpha: 1) // #9DA7B3
         static let accent        = UIColor(red: 0.23, green: 0.74, blue: 1.00, alpha: 1) // #3ABEFF
         static let panel         = UIColor(red: 0.10, green: 0.13, blue: 0.18, alpha: 1) // #1A222D
-        static let warning       = UIColor(red: 0.96, green: 0.65, blue: 0.14, alpha: 1) // #F5A623
+        static let rule          = UIColor(red: 0.30, green: 0.35, blue: 0.42, alpha: 1)
     }
 
-    private enum Fonts {
+    fileprivate enum Fonts {
         static let bodySize: CGFloat = 16
         static let codeSize: CGFloat = 14
 
@@ -57,7 +41,7 @@ enum MarkdownRenderer {
         }
 
         static func heading(level: Int) -> UIFont {
-            let sizes: [CGFloat] = [28, 24, 20, 18, 16, 15]
+            let sizes: [CGFloat] = [32, 24, 20, 16, 14, 13]
             let size = sizes[min(max(level, 1), 6) - 1]
             return UIFont.systemFont(ofSize: size, weight: .bold)
         }
@@ -74,9 +58,7 @@ enum MarkdownRenderer {
         }
     }
 
-    // MARK: - Base
-
-    private static func plain(_ text: String) -> NSAttributedString {
+    fileprivate static func plain(_ text: String) -> NSAttributedString {
         NSAttributedString(
             string: text,
             attributes: [
@@ -86,186 +68,374 @@ enum MarkdownRenderer {
         )
     }
 
-    private static func applyBaseAttributes(to result: NSMutableAttributedString) {
-        let full = NSRange(location: 0, length: result.length)
-        result.addAttribute(.font, value: Fonts.body(), range: full)
-        result.addAttribute(.foregroundColor, value: C.textPrimary, range: full)
+    fileprivate static func highlightedCode(
+        _ text: String,
+        languageHint: String?,
+        paragraphStyle: NSParagraphStyle
+    ) -> NSAttributedString {
+        let language = SyntaxHighlighter.language(for: languageHint ?? "")
+        let highlighted = SyntaxHighlighter.highlight(text: text, language: language)
+        let full = NSRange(location: 0, length: highlighted.length)
+        highlighted.addAttribute(.paragraphStyle, value: paragraphStyle, range: full)
+        highlighted.addAttribute(.backgroundColor, value: C.panel, range: full)
+        return highlighted
     }
 
-    // MARK: - Run styles
+    fileprivate static func horizontalRule(paragraphStyle: NSParagraphStyle) -> NSAttributedString {
+        let attachment = HorizontalRuleAttachment()
+        attachment.image = ruleImage
+        let result = NSMutableAttributedString(attachment: attachment)
+        result.addAttributes(
+            [
+                .foregroundColor: C.rule,
+                .paragraphStyle: paragraphStyle
+            ],
+            range: NSRange(location: 0, length: result.length)
+        )
+        return result
+    }
 
-    private static func applyRunStyles(to result: NSMutableAttributedString) {
-        let full = NSRange(location: 0, length: result.length)
-        result.enumerateAttributes(in: full, options: []) { attrs, range, _ in
-            var weight: UIFont.Weight = .regular
-            var italic = false
-            var mono = false
-            var color = C.textPrimary
-            var sizeOverride: UIFont?
-            let paragraph = NSMutableParagraphStyle()
-            paragraph.lineSpacing = 3
-            paragraph.paragraphSpacing = 8
+    private static let ruleImage: UIImage = {
+        let renderer = UIGraphicsImageRenderer(size: CGSize(width: 1, height: 1))
+        return renderer.image { ctx in
+            C.rule.setFill()
+            ctx.fill(CGRect(x: 0, y: 0, width: 1, height: 1))
+        }
+    }()
 
-            if let inline = attrs[.inlinePresentationIntent] as? InlinePresentationIntent {
-                if inline.contains(.stronglyEmphasized) { weight = .bold }
-                if inline.contains(.emphasized) { italic = true }
-                if inline.contains(.code) {
-                    mono = true
-                    color = C.accent
-                    result.addAttribute(.backgroundColor, value: C.panel, range: range)
-                }
-                if inline.contains(.strikethrough) {
-                    result.addAttribute(
-                        .strikethroughStyle,
-                        value: NSUnderlineStyle.single.rawValue,
-                        range: range
-                    )
-                }
-            }
-
-            if let intent = attrs[.presentationIntent] as? PresentationIntent {
-                applyBlockIntent(intent, paragraph: paragraph, sizeOverride: &sizeOverride, color: &color, mono: &mono)
-                if headerLevel(from: intent) != nil {
-                    weight = .bold
-                    italic = false
-                }
-                if hasCodeBlock(intent) {
-                    result.addAttribute(.backgroundColor, value: C.panel, range: range)
-                }
-            }
-
-            if attrs[.link] != nil {
-                color = C.accent
-                result.addAttribute(.underlineStyle, value: NSUnderlineStyle.single.rawValue, range: range)
-            }
-
-            let font: UIFont
-            if mono {
-                font = Fonts.code(italic: italic)
-            } else if let sizeOverride {
-                font = sizeOverride
-            } else {
-                font = Fonts.body(weight: weight, italic: italic)
-            }
-
-            result.addAttribute(.font, value: font, range: range)
-            result.addAttribute(.foregroundColor, value: color, range: range)
-            result.addAttribute(.paragraphStyle, value: paragraph, range: range)
+    fileprivate final class HorizontalRuleAttachment: NSTextAttachment {
+        override func attachmentBounds(
+            for textContainer: NSTextContainer?,
+            proposedLineFragment lineFrag: CGRect,
+            glyphPosition position: CGPoint,
+            characterIndex charIndex: Int
+        ) -> CGRect {
+            CGRect(x: 0, y: -2, width: max(lineFrag.width, 1), height: 1)
         }
     }
+}
 
-    private static func applyBlockIntent(
-        _ intent: PresentationIntent,
-        paragraph: NSMutableParagraphStyle,
-        sizeOverride: inout UIFont?,
-        color: inout UIColor,
-        mono: inout Bool
-    ) {
-        if let level = headerLevel(from: intent) {
-            sizeOverride = Fonts.heading(level: level)
-            paragraph.paragraphSpacingBefore = level == 1 ? 4 : 14
+// MARK: - PreviewVisitor
+
+private struct PreviewVisitor: MarkupVisitor {
+    typealias Result = NSAttributedString
+
+    private struct Style {
+        var headingLevel: Int?
+        var listDepth = 0
+        var ordered = false
+        var quoteDepth = 0
+        var inTableHeader = false
+        var weight: UIFont.Weight = .regular
+        var italic = false
+        var mono = false
+        var strikethrough = false
+        var link: URL?
+        var isFirstBlock = true
+    }
+
+    private var style = Style()
+
+    mutating func defaultVisit(_ markup: Markup) -> NSAttributedString {
+        visitChildren(markup)
+    }
+
+    mutating func visitDocument(_ document: Document) -> NSAttributedString {
+        joinBlocks(document, marksFirst: true)
+    }
+
+    mutating func visitHeading(_ heading: Heading) -> NSAttributedString {
+        let previous = style.headingLevel
+        style.headingLevel = heading.level
+        defer { style.headingLevel = previous }
+        return styledBlock(visitChildren(heading))
+    }
+
+    mutating func visitParagraph(_ paragraph: Paragraph) -> NSAttributedString {
+        styledBlock(visitChildren(paragraph))
+    }
+
+    mutating func visitText(_ text: Text) -> NSAttributedString {
+        NSAttributedString(string: text.string, attributes: attributes())
+    }
+
+    mutating func visitSoftBreak(_ softBreak: SoftBreak) -> NSAttributedString {
+        NSAttributedString(string: " ", attributes: attributes())
+    }
+
+    mutating func visitLineBreak(_ lineBreak: LineBreak) -> NSAttributedString {
+        NSAttributedString(string: "\n", attributes: attributes())
+    }
+
+    mutating func visitInlineCode(_ inlineCode: InlineCode) -> NSAttributedString {
+        let previous = (style.mono, style.weight)
+        style.mono = true
+        style.weight = .regular
+        defer {
+            style.mono = previous.0
+            style.weight = previous.1
+        }
+        return NSAttributedString(string: inlineCode.code, attributes: attributes())
+    }
+
+    mutating func visitStrong(_ strong: Strong) -> NSAttributedString {
+        let previous = style.weight
+        style.weight = .bold
+        defer { style.weight = previous }
+        return visitChildren(strong)
+    }
+
+    mutating func visitEmphasis(_ emphasis: Emphasis) -> NSAttributedString {
+        let previous = style.italic
+        style.italic = true
+        defer { style.italic = previous }
+        return visitChildren(emphasis)
+    }
+
+    mutating func visitStrikethrough(_ strikethrough: Strikethrough) -> NSAttributedString {
+        let previous = style.strikethrough
+        style.strikethrough = true
+        defer { style.strikethrough = previous }
+        return visitChildren(strikethrough)
+    }
+
+    mutating func visitLink(_ link: Link) -> NSAttributedString {
+        let previous = style.link
+        style.link = link.destination.flatMap(URL.init(string:))
+        defer { style.link = previous }
+        return visitChildren(link)
+    }
+
+    mutating func visitInlineHTML(_ inlineHTML: InlineHTML) -> NSAttributedString {
+        NSAttributedString(string: inlineHTML.rawHTML, attributes: attributes())
+    }
+
+    mutating func visitImage(_ image: Image) -> NSAttributedString {
+        let alt = visitChildren(image)
+        if alt.length > 0 { return alt }
+        return NSAttributedString(string: image.source ?? "", attributes: attributes())
+    }
+
+    mutating func visitUnorderedList(_ unorderedList: UnorderedList) -> NSAttributedString {
+        visitList(unorderedList, ordered: false)
+    }
+
+    mutating func visitOrderedList(_ orderedList: OrderedList) -> NSAttributedString {
+        visitList(orderedList, ordered: true)
+    }
+
+    mutating func visitListItem(_ listItem: ListItem) -> NSAttributedString {
+        let result = NSMutableAttributedString()
+        var isFirstChild = true
+        for child in listItem.children {
+            let piece = visit(child)
+            guard piece.length > 0 else { continue }
+            if result.length > 0 {
+                result.append(newline(matching: result))
+            }
+            let mutable = NSMutableAttributedString(attributedString: piece)
+            if isFirstChild {
+                let prefix = listPrefix(for: listItem)
+                let prefixAttrs = mutable.length > 0
+                    ? mutable.attributes(at: 0, effectiveRange: nil)
+                    : attributes()
+                mutable.insert(NSAttributedString(string: prefix, attributes: prefixAttrs), at: 0)
+                isFirstChild = false
+            }
+            result.append(mutable)
+        }
+        return result
+    }
+
+    mutating func visitCodeBlock(_ codeBlock: CodeBlock) -> NSAttributedString {
+        let text = codeBlock.code.trimmingCharacters(in: .newlines)
+        return MarkdownRenderer.highlightedCode(
+            text,
+            languageHint: codeBlock.language,
+            paragraphStyle: paragraphStyle(codeBlock: true)
+        )
+    }
+
+    mutating func visitThematicBreak(_ thematicBreak: ThematicBreak) -> NSAttributedString {
+        MarkdownRenderer.horizontalRule(paragraphStyle: paragraphStyle(thematicBreak: true))
+    }
+
+    mutating func visitBlockQuote(_ blockQuote: BlockQuote) -> NSAttributedString {
+        style.quoteDepth += 1
+        defer { style.quoteDepth -= 1 }
+        return joinBlocks(blockQuote)
+    }
+
+    mutating func visitHTMLBlock(_ html: HTMLBlock) -> NSAttributedString {
+        let previous = style.mono
+        style.mono = true
+        defer { style.mono = previous }
+        return styledBlock(NSMutableAttributedString(string: html.rawHTML.trimmingCharacters(in: .newlines), attributes: attributes()))
+    }
+
+    mutating func visitTable(_ table: Table) -> NSAttributedString {
+        joinBlocks(table)
+    }
+
+    mutating func visitTableHead(_ tableHead: Table.Head) -> NSAttributedString {
+        style.inTableHeader = true
+        defer { style.inTableHeader = false }
+        return visitTableRowCells(tableHead)
+    }
+
+    mutating func visitTableBody(_ tableBody: Table.Body) -> NSAttributedString {
+        joinBlocks(tableBody)
+    }
+
+    mutating func visitTableRow(_ tableRow: Table.Row) -> NSAttributedString {
+        visitTableRowCells(tableRow)
+    }
+
+    mutating func visitTableCell(_ tableCell: Table.Cell) -> NSAttributedString {
+        visitChildren(tableCell)
+    }
+
+    // MARK: - Helpers
+
+    private mutating func visitList(_ markup: Markup, ordered: Bool) -> NSAttributedString {
+        let previous = (style.listDepth, style.ordered)
+        style.listDepth += 1
+        style.ordered = ordered
+        defer {
+            style.listDepth = previous.0
+            style.ordered = previous.1
+        }
+        return joinBlocks(markup)
+    }
+
+    private mutating func visitChildren(_ markup: Markup) -> NSMutableAttributedString {
+        let result = NSMutableAttributedString()
+        for child in markup.children {
+            result.append(visit(child))
+        }
+        return result
+    }
+
+    private mutating func joinBlocks(_ markup: Markup, marksFirst: Bool = false) -> NSAttributedString {
+        let result = NSMutableAttributedString()
+        for child in markup.children {
+            let piece = visit(child)
+            if marksFirst { style.isFirstBlock = false }
+            guard piece.length > 0 else { continue }
+            if result.length > 0 {
+                result.append(newline(matching: result))
+            }
+            result.append(piece)
+        }
+        return result
+    }
+
+    private mutating func visitTableRowCells(_ markup: Markup) -> NSAttributedString {
+        let result = NSMutableAttributedString()
+        for child in markup.children {
+            if result.length > 0 {
+                result.append(NSAttributedString(string: "  │  ", attributes: attributes()))
+            }
+            result.append(visit(child))
+        }
+        return styledBlock(NSMutableAttributedString(attributedString: result))
+    }
+
+    private func listPrefix(for item: ListItem) -> String {
+        if let checkbox = item.checkbox {
+            return checkbox == .checked ? "☑ " : "☐ "
+        }
+        if style.ordered, let parent = item.parent as? OrderedList {
+            return "\(parent.startIndex + UInt(item.indexInParent)). "
+        }
+        return "• "
+    }
+
+    private func styledBlock(_ content: NSMutableAttributedString) -> NSAttributedString {
+        guard content.length > 0 else { return content }
+        content.addAttribute(
+            .paragraphStyle,
+            value: paragraphStyle(),
+            range: NSRange(location: 0, length: content.length)
+        )
+        return content
+    }
+
+    private func newline(matching result: NSAttributedString) -> NSAttributedString {
+        let attrs = result.length > 0
+            ? result.attributes(at: result.length - 1, effectiveRange: nil)
+            : attributes()
+        return NSAttributedString(string: "\n", attributes: attrs)
+    }
+
+    private func attributes() -> [NSAttributedString.Key: Any] {
+        var color = MarkdownRenderer.C.textPrimary
+        if style.quoteDepth > 0 { color = MarkdownRenderer.C.textSecondary }
+        if style.link != nil { color = MarkdownRenderer.C.accent }
+
+        let weight: UIFont.Weight = style.inTableHeader ? .semibold : style.weight
+        let font: UIFont
+        if style.mono {
+            font = MarkdownRenderer.Fonts.code(italic: style.italic)
+        } else if let level = style.headingLevel {
+            font = MarkdownRenderer.Fonts.heading(level: level)
+        } else {
+            font = MarkdownRenderer.Fonts.body(weight: weight, italic: style.italic)
+        }
+
+        var attrs: [NSAttributedString.Key: Any] = [
+            .font: font,
+            .foregroundColor: color,
+            .paragraphStyle: paragraphStyle()
+        ]
+        if style.mono {
+            attrs[.backgroundColor] = MarkdownRenderer.C.panel
+        }
+        if let link = style.link {
+            attrs[.link] = link
+            attrs[.underlineStyle] = NSUnderlineStyle.single.rawValue
+        }
+        if style.strikethrough {
+            attrs[.strikethroughStyle] = NSUnderlineStyle.single.rawValue
+        }
+        return attrs
+    }
+
+    private func paragraphStyle(codeBlock: Bool = false, thematicBreak: Bool = false) -> NSMutableParagraphStyle {
+        let paragraph = NSMutableParagraphStyle()
+        paragraph.lineSpacing = codeBlock ? 2 : 3
+        paragraph.paragraphSpacing = 10
+
+        if let level = style.headingLevel {
+            paragraph.paragraphSpacingBefore = style.isFirstBlock ? 0 : (level <= 2 ? 18 : 14)
             paragraph.paragraphSpacing = 10
         }
 
-        let listDepth = intent.components.filter { component in
-            switch component.kind {
-            case .unorderedList, .orderedList: return true
-            default: return false
-            }
-        }.count
-
-        if listDepth > 0 {
-            let indent = CGFloat(listDepth) * 20
-            paragraph.firstLineHeadIndent = indent
-            paragraph.headIndent = indent + 18
+        if style.listDepth > 0 {
+            let nest = CGFloat(max(style.listDepth - 1, 0)) * 22
+            let markerWidth: CGFloat = style.ordered ? 28 : 18
+            paragraph.firstLineHeadIndent = nest
+            paragraph.headIndent = nest + markerWidth
             paragraph.paragraphSpacing = 4
+            paragraph.paragraphSpacingBefore = 0
         }
 
-        for component in intent.components {
-            switch component.kind {
-            case .codeBlock:
-                mono = true
-                color = C.textPrimary
-                paragraph.paragraphSpacing = 12
-                paragraph.lineSpacing = 2
-            case .blockQuote:
-                color = C.textSecondary
-                paragraph.firstLineHeadIndent = max(paragraph.firstLineHeadIndent, 16)
-                paragraph.headIndent = max(paragraph.headIndent, 16)
-            case .thematicBreak:
-                color = C.textSecondary
-            default:
-                break
-            }
-        }
-    }
-
-    private static func hasCodeBlock(_ intent: PresentationIntent) -> Bool {
-        intent.components.contains { component in
-            if case .codeBlock = component.kind { return true }
-            return false
-        }
-    }
-
-    private static func headerLevel(from intent: PresentationIntent) -> Int? {
-        for component in intent.components {
-            if case .header(let level) = component.kind { return level }
-        }
-        return nil
-    }
-
-    // MARK: - List markers
-    // `.full` syntax strips "-", "*", and "1." — reinsert visible bullets/numbers
-    // at the start of each list item identity.
-
-    private static func insertListMarkers(into result: NSMutableAttributedString) {
-        var firstLocationByIdentity: [Int: (location: Int, prefix: String)] = [:]
-        let full = NSRange(location: 0, length: result.length)
-
-        result.enumerateAttribute(.presentationIntent, in: full, options: []) { value, range, _ in
-            guard let intent = value as? PresentationIntent,
-                  let item = listItemComponent(from: intent) else { return }
-
-            let prefix: String
-            if isOrdered(intent), case .listItem(let ordinal) = item.kind {
-                prefix = "\(ordinal). "
-            } else {
-                prefix = "• "
-            }
-
-            if let existing = firstLocationByIdentity[item.identity] {
-                if range.location < existing.location {
-                    firstLocationByIdentity[item.identity] = (range.location, prefix)
-                }
-            } else {
-                firstLocationByIdentity[item.identity] = (range.location, prefix)
-            }
+        if style.quoteDepth > 0 {
+            let quoteIndent = CGFloat(style.quoteDepth) * 16
+            paragraph.firstLineHeadIndent = max(paragraph.firstLineHeadIndent, quoteIndent)
+            paragraph.headIndent = max(paragraph.headIndent, quoteIndent)
         }
 
-        let insertions = firstLocationByIdentity.values.sorted { $0.location > $1.location }
-        for insertion in insertions {
-            let location = min(insertion.location, result.length)
-            let attrs: [NSAttributedString.Key: Any]
-            if result.length > 0 {
-                attrs = result.attributes(at: min(location, result.length - 1), effectiveRange: nil)
-            } else {
-                attrs = [:]
-            }
-            result.insert(NSAttributedString(string: insertion.prefix, attributes: attrs), at: location)
+        if codeBlock {
+            paragraph.paragraphSpacing = 12
+            paragraph.paragraphSpacingBefore = style.isFirstBlock ? 0 : 8
         }
-    }
 
-    private static func listItemComponent(from intent: PresentationIntent) -> PresentationIntent.IntentComponent? {
-        intent.components.first { component in
-            if case .listItem = component.kind { return true }
-            return false
+        if thematicBreak {
+            paragraph.paragraphSpacingBefore = style.isFirstBlock ? 0 : 12
+            paragraph.paragraphSpacing = 12
         }
-    }
 
-    private static func isOrdered(_ intent: PresentationIntent) -> Bool {
-        intent.components.contains { component in
-            if case .orderedList = component.kind { return true }
-            return false
-        }
+        return paragraph
     }
 }
