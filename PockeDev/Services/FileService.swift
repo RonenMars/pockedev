@@ -14,24 +14,23 @@ final class FileService: @unchecked Sendable {
 
     /// Returns the immediate children of `directory`, sorted: folders first, then files.
     func listItems(in directory: URL) throws -> [FileItem] {
-        let accessed = directory.startAccessingSecurityScopedResource()
-        defer { if accessed { directory.stopAccessingSecurityScopedResource() } }
-
-        let urls = try fileManager.contentsOfDirectory(
-            at: directory,
-            includingPropertiesForKeys: [.isDirectoryKey, .nameKey],
-            options: .skipsHiddenFiles
-        )
-        return urls
-            .map { url in
-                var isDir: ObjCBool = false
-                fileManager.fileExists(atPath: url.path, isDirectory: &isDir)
-                return FileItem(url: url, isDirectory: isDir.boolValue)
-            }
-            .sorted { lhs, rhs in
-                if lhs.isDirectory != rhs.isDirectory { return lhs.isDirectory }
-                return lhs.name.localizedCaseInsensitiveCompare(rhs.name) == .orderedAscending
-            }
+        try withCoordinatedAccess(to: directory) { scopedURL in
+            let urls = try fileManager.contentsOfDirectory(
+                at: scopedURL,
+                includingPropertiesForKeys: [.isDirectoryKey, .nameKey],
+                options: .skipsHiddenFiles
+            )
+            return urls
+                .map { url in
+                    var isDir: ObjCBool = false
+                    fileManager.fileExists(atPath: url.path, isDirectory: &isDir)
+                    return FileItem(url: url, isDirectory: isDir.boolValue)
+                }
+                .sorted { lhs, rhs in
+                    if lhs.isDirectory != rhs.isDirectory { return lhs.isDirectory }
+                    return lhs.name.localizedCaseInsensitiveCompare(rhs.name) == .orderedAscending
+                }
+        }
     }
 
     // MARK: - Read / write
@@ -95,6 +94,31 @@ final class FileService: @unchecked Sendable {
         }
         return result
     }
+
+    /// Security-scoped picker URLs (especially On My iPhone File Provider
+    /// folders) must be accessed and coordinated before listing, or
+    /// `contentsOfDirectory` fails with "no such file".
+    private func withCoordinatedAccess<T>(to url: URL, _ body: (URL) throws -> T) throws -> T {
+        let accessed = url.startAccessingSecurityScopedResource()
+        defer { if accessed { url.stopAccessingSecurityScopedResource() } }
+
+        var coordinatorError: NSError?
+        var bodyResult: Result<T, Error>?
+        NSFileCoordinator().coordinate(
+            readingItemAt: url,
+            options: .withoutChanges,
+            error: &coordinatorError
+        ) { coordinatedURL in
+            do {
+                bodyResult = .success(try body(coordinatedURL))
+            } catch {
+                bodyResult = .failure(error)
+            }
+        }
+        if let coordinatorError { throw coordinatorError }
+        guard let bodyResult else { throw FileServiceError.accessFailed }
+        return try bodyResult.get()
+    }
 }
 
 // MARK: - FileServiceError
@@ -102,11 +126,13 @@ final class FileService: @unchecked Sendable {
 enum FileServiceError: LocalizedError {
     case alreadyExists
     case createFailed
+    case accessFailed
 
     var errorDescription: String? {
         switch self {
         case .alreadyExists: return "A file or folder with that name already exists."
         case .createFailed:  return "Could not create the file."
+        case .accessFailed:  return "Could not access the folder."
         }
     }
 }
