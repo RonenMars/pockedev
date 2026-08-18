@@ -29,7 +29,7 @@ targets:
       PRODUCT_BUNDLE_IDENTIFIER: com.pockedev.app
       INFOPLIST_FILE: PockeDev/Info.plist
       MARKETING_VERSION: "1.0"
-      CURRENT_PROJECT_VERSION: "2"
+      CURRENT_PROJECT_VERSION: "3"
   PockeDevTests:
     type: bundle.unit-test
     platform: iOS
