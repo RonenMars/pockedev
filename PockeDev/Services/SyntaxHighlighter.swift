@@ -64,6 +64,25 @@ enum SyntaxHighlighter {
         }
     }
 
+    /// Maps fenced-code info strings (`javascript`, `js`, `c++`) rather than file extensions.
+    static func language(forFenceInfo info: String?) -> Language {
+        guard let raw = info?.trimmingCharacters(in: .whitespacesAndNewlines).lowercased(),
+              !raw.isEmpty else { return .plain }
+        let token = raw.split(whereSeparator: { $0.isWhitespace || $0 == "," }).first.map(String.init) ?? raw
+        switch token {
+        case "swift":                           return .swift
+        case "js", "javascript", "ts", "typescript", "jsx", "tsx":
+            return .javascript
+        case "py", "python":                    return .python
+        case "json":                            return .json
+        case "md", "markdown":                  return .markdown
+        case "css", "scss", "sass", "less":     return .css
+        case "html", "htm":                     return .html
+        case "yaml", "yml":                     return .yaml
+        default:                                return language(for: token)
+        }
+    }
+
     // MARK: - Token colors
 
     private enum C {

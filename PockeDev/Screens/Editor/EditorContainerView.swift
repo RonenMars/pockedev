@@ -1,8 +1,9 @@
 import SwiftUI
+import UIKit
 
 // MARK: - EditorContainerView (UI_SPEC: Editor)
 // States: loading, error, editing
-// Features: TabsBar, CodeEditorView, Save, Search overlay
+// Features: TabsBar, CodeEditorView, Markdown preview, Save, Search overlay
 // DESIGN.md §2.2: Editor ≥ 80% of screen.
 
 struct EditorContainerView: View {
@@ -86,8 +87,31 @@ struct EditorContainerView: View {
                         Image(systemName: "curlybraces")
                             .font(.system(size: 15, weight: .regular))
                             .foregroundColor(session.languageOverride == nil ? Tokens.Color.textSecondary : Tokens.Color.accent)
-                            .frame(width: 36, height: 44)
+                            .frame(width: 44, height: 44)
                     }
+                }
+
+                if let session = sessionStore.activeSession, session.language == .markdown {
+                    Button {
+                        withAnimation(.easeInOut(duration: Tokens.Motion.normal)) {
+                            let next = !session.isMarkdownPreview
+                            sessionStore.setMarkdownPreview(next, sessionID: session.id)
+                            if next { dismissSearch() }
+                            UIAccessibility.post(
+                                notification: .screenChanged,
+                                argument: next ? "Markdown preview" : "Markdown source"
+                            )
+                        }
+                    } label: {
+                        Image(systemName: session.isMarkdownPreview ? "pencil" : "eye")
+                            .font(.system(size: 15, weight: .regular))
+                            .foregroundColor(session.isMarkdownPreview ? Tokens.Color.accent : Tokens.Color.textSecondary)
+                            .frame(width: 44, height: 44)
+                    }
+                    .buttonStyle(.plain)
+                    .accessibilityLabel("Markdown preview")
+                    .accessibilityValue(session.isMarkdownPreview ? "Preview" : "Source")
+                    .accessibilityHint("Switches between styled preview and editable source")
                 }
 
                 // Search toggle
@@ -97,10 +121,12 @@ struct EditorContainerView: View {
                     Image(systemName: "magnifyingglass")
                         .font(.system(size: 15, weight: .regular))
                         .foregroundColor(showSearch ? Tokens.Color.accent : Tokens.Color.textSecondary)
-                        .frame(width: 36, height: 44)
+                        .frame(width: 44, height: 44)
                 }
                 .buttonStyle(.plain)
                 .disabled(sessionStore.activeSession == nil)
+                .accessibilityLabel("Search")
+                .accessibilityHint("Find text in the current file. Switches to source if Markdown preview is on.")
 
                 // Save
                 if let session = sessionStore.activeSession {
@@ -130,6 +156,7 @@ struct EditorContainerView: View {
             } else if let error = session.error {
                 errorView(message: error, sessionID: session.id)
             } else {
+                let isPreview = session.isMarkdownPreview && session.language == .markdown
                 ZStack(alignment: .top) {
                     CodeEditorView(
                         text: Binding(
@@ -141,8 +168,17 @@ struct EditorContainerView: View {
                         activeMatchIndex: currentMatchIndex,
                         onTextChange: { sessionStore.updateContent($0, sessionID: session.id) }
                     )
+                    .opacity(isPreview ? 0 : 1)
+                    .allowsHitTesting(!isPreview)
+                    .accessibilityHidden(isPreview)
 
-                    // Search overlay — slides in from top (DESIGN.md §6.3)
+                    if session.language == .markdown {
+                        MarkdownPreviewView(markdown: session.content)
+                            .opacity(isPreview ? 1 : 0)
+                            .allowsHitTesting(isPreview)
+                            .accessibilityHidden(!isPreview)
+                    }
+
                     if showSearch {
                         SearchOverlay(
                             query: $searchQuery,
@@ -274,6 +310,9 @@ struct EditorContainerView: View {
         if showSearch {
             dismissSearch()
         } else {
+            if let session = sessionStore.activeSession, session.isMarkdownPreview {
+                sessionStore.setMarkdownPreview(false, sessionID: session.id)
+            }
             showSearch = true
         }
     }

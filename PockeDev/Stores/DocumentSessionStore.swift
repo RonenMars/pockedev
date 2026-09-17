@@ -70,6 +70,15 @@ final class DocumentSessionStore: ObservableObject, @unchecked Sendable {
     func setLanguage(_ language: SyntaxHighlighter.Language?, sessionID: UUID) {
         mutate(id: sessionID) {
             $0.languageOverride = language
+            if $0.language != .markdown {
+                $0.isMarkdownPreview = false
+            }
+        }
+    }
+
+    func setMarkdownPreview(_ isPreview: Bool, sessionID: UUID) {
+        mutate(id: sessionID) {
+            $0.isMarkdownPreview = isPreview && $0.language == .markdown
         }
     }
 

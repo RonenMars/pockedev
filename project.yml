@@ -14,6 +14,9 @@ packages:
   Gitty:
     url: git@github.com:RonenMars/Gitty.git
     branch: main
+  swift-markdown:
+    url: https://github.com/swiftlang/swift-markdown.git
+    exactVersion: 0.8.0
 
 targets:
   PockeDev:
@@ -25,6 +28,8 @@ targets:
     dependencies:
       - package: Gitty
         product: Gitty
+      - package: swift-markdown
+        product: Markdown
     settings:
       PRODUCT_BUNDLE_IDENTIFIER: com.pockedev.app
       INFOPLIST_FILE: PockeDev/Info.plist

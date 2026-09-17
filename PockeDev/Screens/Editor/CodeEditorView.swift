@@ -6,6 +6,7 @@ import UIKit
 //
 // Highlighting pipeline (two-pass, cached):
 //   Pass 1 — syntax: runs when text or fileExtension changes. Result cached in coordinator.
+//            Large replacements (file open / paste) highlight off the main thread.
 //   Pass 2 — search overlay: runs when searchMatches or activeMatchIndex changes.
 //            Applies background tints on a COPY of the cached syntax attributed string.
 //            Never mutates the cache, so pass 1 re-runs only when content changes.
@@ -24,38 +25,34 @@ struct CodeEditorView: UIViewRepresentable {
 
     // MARK: - Search highlight colors
 
-    private static let inactiveMatchColor = UIColor(
-        red: 0.96, green: 0.65, blue: 0.14, alpha: 0.28  // amber #F5A623 at 28%
-    )
-    private static let activeMatchColor = UIColor(
-        red: 0.23, green: 0.74, blue: 1.00, alpha: 0.45  // accent #3ABEFF at 45%
+    private static let inactiveMatchColor = Tokens.UIColor.warning.withAlphaComponent(0.28)
+    private static let activeMatchColor = Tokens.UIColor.accent.withAlphaComponent(0.45)
+
+    private static let bodyAttributes: [NSAttributedString.Key: Any] = [
+        .font: UIFont.monospacedSystemFont(ofSize: 14, weight: .regular),
+        .foregroundColor: Tokens.UIColor.textPrimary
+    ]
+
+    private static let highlightQueue = DispatchQueue(
+        label: "com.pockedev.syntax-highlight",
+        qos: .userInitiated
     )
 
     // MARK: - UIViewRepresentable
 
     func makeUIView(context: Context) -> UITextView {
-        let textView = UITextView()
-
+        let textView = TextKit1TextView.make(
+            background: Tokens.UIColor.background,
+            tint: Tokens.UIColor.accent
+        )
         textView.delegate = context.coordinator
-        textView.isScrollEnabled = true
-        textView.alwaysBounceVertical = true
-        textView.showsVerticalScrollIndicator = true
-
         textView.font = UIFont.monospacedSystemFont(ofSize: 14, weight: .regular)
-        textView.backgroundColor = UIColor(red: 0.04, green: 0.06, blue: 0.08, alpha: 1) // background
-        textView.textColor = UIColor(red: 0.90, green: 0.93, blue: 0.95, alpha: 1)       // textPrimary
-        textView.tintColor = UIColor(red: 0.23, green: 0.74, blue: 1.00, alpha: 1)       // accent (cursor)
-
-        // Padding (DESIGN.md §5.3)
-        textView.textContainerInset = UIEdgeInsets(top: 16, left: 12, bottom: 16, right: 12)
-        textView.textContainer.lineFragmentPadding = 0
-
+        textView.textColor = Tokens.UIColor.textPrimary
         textView.keyboardAppearance = .dark
         textView.autocorrectionType = .no
         textView.autocapitalizationType = .none
         textView.smartDashesType = .no
         textView.smartQuotesType = .no
-
         return textView
     }
 
@@ -68,58 +65,43 @@ struct CodeEditorView: UIViewRepresentable {
         let searchChanged  = c.lastMatches != searchMatches || c.lastActiveIndex != activeMatchIndex
 
         guard textChanged || searchChanged else {
-            // Only isEditable may have changed
             textView.isEditable = isEditable
             return
         }
 
-        // Pass 1 — rebuild syntax cache only when content or language changed
-        if textChanged {
-            c.cachedSyntaxAttr = SyntaxHighlighter.highlight(text: text, language: language)
-            c.lastText = text
-            c.lastLanguage = language
-        }
-
-        guard let base = c.cachedSyntaxAttr else { return }
-
-        // Pass 2 — overlay search match backgrounds on a copy of the syntax result
-        let result: NSMutableAttributedString
-        if searchMatches.isEmpty {
-            // No matches: use the cached syntax attributed string directly.
-            // UIKit copies attributedText on assignment, so the cache stays clean.
-            result = base
-        } else {
-            result = base.mutableCopy() as! NSMutableAttributedString
-            for (i, match) in searchMatches.enumerated() {
-                guard NSMaxRange(match) <= result.length else { continue }
-                let color = i == activeMatchIndex
-                    ? CodeEditorView.activeMatchColor
-                    : CodeEditorView.inactiveMatchColor
-                result.addAttribute(.backgroundColor, value: color, range: match)
-            }
-        }
-
-        // Preserve cursor before replacing attributed text
-        let savedRange = textView.selectedRange
-        textView.attributedText = result
-        let maxLoc = result.length
-        let loc = min(savedRange.location, maxLoc)
-        let len = min(savedRange.length, maxLoc - loc)
-        textView.selectedRange = NSRange(location: loc, length: len)
-
-        // Scroll to active match only when the active index changed AND range is off-screen
         let prevActiveIndex = c.lastActiveIndex
         c.lastMatches = searchMatches
         c.lastActiveIndex = activeMatchIndex
 
-        if activeMatchIndex != prevActiveIndex,
-           activeMatchIndex >= 0,
-           activeMatchIndex < searchMatches.count {
-            let activeRange = searchMatches[activeMatchIndex]
-            if NSMaxRange(activeRange) <= result.length,
-               !isRangeVisible(textView: textView, range: activeRange) {
-                textView.scrollRangeToVisible(activeRange)
+        if textChanged {
+            let isLargeReplace = c.lastText == nil
+                || abs((c.lastText?.utf16.count ?? 0) - text.utf16.count) > 512
+            c.lastText = text
+            c.lastLanguage = language
+            c.highlightGeneration += 1
+            let generation = c.highlightGeneration
+
+            if isLargeReplace {
+                apply(NSMutableAttributedString(string: text, attributes: Self.bodyAttributes), to: textView)
+                let snapshot = text
+                let lang = language
+                Self.highlightQueue.async { [weak c] in
+                    guard let c, generation == c.highlightGeneration else { return }
+                    let highlighted = SyntaxHighlighter.highlight(text: snapshot, language: lang)
+                    DispatchQueue.main.async { [weak c] in
+                        guard let c, generation == c.highlightGeneration else { return }
+                        c.cachedSyntaxAttr = highlighted
+                        applyDisplayed(highlighted, to: textView, coordinator: c, prevActiveIndex: prevActiveIndex)
+                    }
+                }
+            } else {
+                c.cachedSyntaxAttr = SyntaxHighlighter.highlight(text: text, language: language)
+                if let base = c.cachedSyntaxAttr {
+                    applyDisplayed(base, to: textView, coordinator: c, prevActiveIndex: prevActiveIndex)
+                }
             }
+        } else if let base = c.cachedSyntaxAttr {
+            applyDisplayed(base, to: textView, coordinator: c, prevActiveIndex: prevActiveIndex)
         }
 
         textView.isEditable = isEditable
@@ -129,11 +111,50 @@ struct CodeEditorView: UIViewRepresentable {
         Coordinator(onTextChange: onTextChange)
     }
 
+    // MARK: - Apply attributed text
+
+    private func applyDisplayed(
+        _ base: NSMutableAttributedString,
+        to textView: UITextView,
+        coordinator c: Coordinator,
+        prevActiveIndex: Int
+    ) {
+        let result: NSMutableAttributedString
+        if c.lastMatches.isEmpty {
+            result = base
+        } else {
+            result = base.mutableCopy() as! NSMutableAttributedString
+            for (i, match) in c.lastMatches.enumerated() {
+                guard NSMaxRange(match) <= result.length else { continue }
+                let color = i == c.lastActiveIndex
+                    ? CodeEditorView.activeMatchColor
+                    : CodeEditorView.inactiveMatchColor
+                result.addAttribute(.backgroundColor, value: color, range: match)
+            }
+        }
+
+        apply(result, to: textView)
+
+        if c.lastActiveIndex != prevActiveIndex,
+           c.lastActiveIndex >= 0,
+           c.lastActiveIndex < c.lastMatches.count {
+            let activeRange = c.lastMatches[c.lastActiveIndex]
+            if NSMaxRange(activeRange) <= result.length,
+               !isRangeVisible(textView: textView, range: activeRange) {
+                textView.scrollRangeToVisible(activeRange)
+            }
+        }
+    }
+
+    private func apply(_ result: NSAttributedString, to textView: UITextView) {
+        TextKit1TextView.setAttributedString(result, on: textView, restoreSelection: true)
+    }
+
     // MARK: - Visibility check
 
     /// Returns true if the first line of `range` is within the textView's visible bounds.
     private func isRangeVisible(textView: UITextView, range: NSRange) -> Bool {
-        guard range.length > 0, range.location < (textView.text as NSString).length else {
+        guard range.length > 0, range.location < textView.textStorage.length else {
             return true
         }
         let glyphRange = textView.layoutManager.glyphRange(
@@ -157,6 +178,7 @@ struct CodeEditorView: UIViewRepresentable {
         var cachedSyntaxAttr: NSMutableAttributedString? = nil
         var lastText: String? = nil
         var lastLanguage: SyntaxHighlighter.Language? = nil
+        var highlightGeneration = 0
 
         // Search state cache — rebuilt when matches or active index changes
         var lastMatches: [NSRange] = []
