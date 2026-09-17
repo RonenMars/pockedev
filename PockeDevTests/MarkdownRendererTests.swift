@@ -171,8 +171,9 @@ final class MarkdownRendererTests: XCTestCase {
         let strike = MarkdownRenderer.render("~~gone~~")
         let ns = strike.string as NSString
         let range = ns.range(of: "gone")
-        let style = strike.attribute(.strikethroughStyle, at: range.location, effectiveRange: nil) as? Int
-        XCTAssertEqual(style, NSUnderlineStyle.single.rawValue)
+        let style = strike.attribute(.strikethroughStyle, at: range.location, effectiveRange: nil)
+        let raw = (style as? NSNumber)?.intValue ?? style as? Int
+        XCTAssertEqual(raw, NSUnderlineStyle.single.rawValue)
 
         let tasks = MarkdownRenderer.render("- [x] done\n- [ ] todo")
         XCTAssertTrue(tasks.string.contains("☑"))
