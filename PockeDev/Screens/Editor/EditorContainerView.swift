@@ -1,4 +1,5 @@
 import SwiftUI
+import UIKit
 
 // MARK: - EditorContainerView (UI_SPEC: Editor)
 // States: loading, error, editing
@@ -23,7 +24,6 @@ struct EditorContainerView: View {
     @State private var isCaseSensitive = false
     @State private var showReplace = false
     @State private var isInvalidRegex = false
-    @State private var showMarkdownPreview = false
 
     var body: some View {
         ZStack {
@@ -60,14 +60,6 @@ struct EditorContainerView: View {
         // Recompute matches when the active tab changes
         .onChange(of: sessionStore.activeSessionID) { _ in
             recomputeMatches()
-            if sessionStore.activeSession?.language != .markdown {
-                showMarkdownPreview = false
-            }
-        }
-        .onChange(of: sessionStore.activeSession?.language) { language in
-            if language != .markdown {
-                showMarkdownPreview = false
-            }
         }
     }
 
@@ -95,25 +87,31 @@ struct EditorContainerView: View {
                         Image(systemName: "curlybraces")
                             .font(.system(size: 15, weight: .regular))
                             .foregroundColor(session.languageOverride == nil ? Tokens.Color.textSecondary : Tokens.Color.accent)
-                            .frame(width: 36, height: 44)
+                            .frame(width: 44, height: 44)
                     }
                 }
 
-                // Markdown preview (only when the active file is Markdown)
-                if sessionStore.activeSession?.language == .markdown {
+                if let session = sessionStore.activeSession, session.language == .markdown {
                     Button {
                         withAnimation(.easeInOut(duration: Tokens.Motion.normal)) {
-                            showMarkdownPreview.toggle()
-                            if showMarkdownPreview { dismissSearch() }
+                            let next = !session.isMarkdownPreview
+                            sessionStore.setMarkdownPreview(next, sessionID: session.id)
+                            if next { dismissSearch() }
+                            UIAccessibility.post(
+                                notification: .screenChanged,
+                                argument: next ? "Markdown preview" : "Markdown source"
+                            )
                         }
                     } label: {
-                        Image(systemName: showMarkdownPreview ? "pencil" : "eye")
+                        Image(systemName: session.isMarkdownPreview ? "pencil" : "eye")
                             .font(.system(size: 15, weight: .regular))
-                            .foregroundColor(showMarkdownPreview ? Tokens.Color.accent : Tokens.Color.textSecondary)
-                            .frame(width: 36, height: 44)
+                            .foregroundColor(session.isMarkdownPreview ? Tokens.Color.accent : Tokens.Color.textSecondary)
+                            .frame(width: 44, height: 44)
                     }
                     .buttonStyle(.plain)
-                    .accessibilityLabel(showMarkdownPreview ? "Show Markdown source" : "Preview Markdown")
+                    .accessibilityLabel("Markdown preview")
+                    .accessibilityValue(session.isMarkdownPreview ? "Preview" : "Source")
+                    .accessibilityHint("Switches between styled preview and editable source")
                 }
 
                 // Search toggle
@@ -123,10 +121,12 @@ struct EditorContainerView: View {
                     Image(systemName: "magnifyingglass")
                         .font(.system(size: 15, weight: .regular))
                         .foregroundColor(showSearch ? Tokens.Color.accent : Tokens.Color.textSecondary)
-                        .frame(width: 36, height: 44)
+                        .frame(width: 44, height: 44)
                 }
                 .buttonStyle(.plain)
-                .disabled(sessionStore.activeSession == nil || showMarkdownPreview)
+                .disabled(sessionStore.activeSession == nil)
+                .accessibilityLabel("Search")
+                .accessibilityHint("Find text in the current file. Switches to source if Markdown preview is on.")
 
                 // Save
                 if let session = sessionStore.activeSession {
@@ -155,9 +155,8 @@ struct EditorContainerView: View {
                 loadingView
             } else if let error = session.error {
                 errorView(message: error, sessionID: session.id)
-            } else if showMarkdownPreview && session.language == .markdown {
-                MarkdownPreviewView(markdown: session.content)
             } else {
+                let isPreview = session.isMarkdownPreview && session.language == .markdown
                 ZStack(alignment: .top) {
                     CodeEditorView(
                         text: Binding(
@@ -169,8 +168,17 @@ struct EditorContainerView: View {
                         activeMatchIndex: currentMatchIndex,
                         onTextChange: { sessionStore.updateContent($0, sessionID: session.id) }
                     )
+                    .opacity(isPreview ? 0 : 1)
+                    .allowsHitTesting(!isPreview)
+                    .accessibilityHidden(isPreview)
 
-                    // Search overlay — slides in from top (DESIGN.md §6.3)
+                    if session.language == .markdown {
+                        MarkdownPreviewView(markdown: session.content)
+                            .opacity(isPreview ? 1 : 0)
+                            .allowsHitTesting(isPreview)
+                            .accessibilityHidden(!isPreview)
+                    }
+
                     if showSearch {
                         SearchOverlay(
                             query: $searchQuery,
@@ -302,6 +310,9 @@ struct EditorContainerView: View {
         if showSearch {
             dismissSearch()
         } else {
+            if let session = sessionStore.activeSession, session.isMarkdownPreview {
+                sessionStore.setMarkdownPreview(false, sessionID: session.id)
+            }
             showSearch = true
         }
     }

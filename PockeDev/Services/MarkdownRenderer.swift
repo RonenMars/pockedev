@@ -6,30 +6,83 @@ import UIKit
 // Converts Markdown source into a dark-theme NSAttributedString using swift-markdown
 // (cmark-gfm). The parser yields a Markup tree; this renderer walks it and applies
 // GitHub-like preview styles for a read-only editor preview.
+//
+// Tables are pipe-separated rows (not NSTextTable). Images use alt text (or a
+// spoken "Image, …" fallback) and are never fetched.
 
 enum MarkdownRenderer {
 
-    private static let maxPreviewUTF16Count = 100_000
+    static let maxPreviewUTF16Count = 100_000
+    static let maxFenceHighlightUTF16Count = 16_000
+
+    private static let allowedLinkSchemes: Set<String> = ["http", "https", "mailto"]
+    fileprivate static let headingLevelKey = NSAttributedString.Key(UIAccessibilitySpeechAttributeHeadingLevel)
+
+    static func prepare() {
+        _ = ruleImage
+        _ = Fonts.body()
+        _ = Fonts.heading(level: 1)
+        _ = Fonts.code()
+    }
 
     static func render(_ markdown: String) -> NSAttributedString {
         guard !markdown.isEmpty else { return NSAttributedString() }
 
+        let source: String
+        let notice: NSAttributedString?
         if markdown.utf16.count > maxPreviewUTF16Count {
-            return plain(markdown)
+            source = utf16Prefix(markdown, limit: maxPreviewUTF16Count)
+            notice = truncationNotice(shown: source.utf16.count, total: markdown.utf16.count)
+        } else {
+            source = markdown
+            notice = nil
         }
 
         var visitor = PreviewVisitor()
-        return visitor.visit(Document(parsing: markdown))
+        let body = visitor.visit(Document(parsing: source))
+        guard let notice else { return body }
+
+        let result = NSMutableAttributedString(attributedString: notice)
+        result.append(NSAttributedString(string: "\n\n"))
+        result.append(body)
+        return result
     }
 
-    // MARK: - Colors / fonts (match Tokens.swift)
+    static func sanitizedLink(from destination: String?) -> URL? {
+        guard let destination,
+              let url = URL(string: destination),
+              let scheme = url.scheme?.lowercased(),
+              allowedLinkSchemes.contains(scheme)
+        else { return nil }
+        return url
+    }
+
+    static func isAllowedLink(_ url: URL) -> Bool {
+        guard let scheme = url.scheme?.lowercased() else { return false }
+        return allowedLinkSchemes.contains(scheme)
+    }
+
+    static func utf16Prefix(_ text: String, limit: Int) -> String {
+        guard text.utf16.count > limit else { return text }
+        var count = 0
+        var end = text.startIndex
+        for index in text.indices {
+            let extra = text[index].utf16.count
+            if count + extra > limit { break }
+            count += extra
+            end = text.index(after: index)
+        }
+        return String(text[text.startIndex..<end])
+    }
+
+    // MARK: - Colors / fonts
 
     fileprivate enum C {
-        static let textPrimary   = UIColor(red: 0.90, green: 0.93, blue: 0.95, alpha: 1) // #E6EDF3
-        static let textSecondary = UIColor(red: 0.62, green: 0.65, blue: 0.70, alpha: 1) // #9DA7B3
-        static let accent        = UIColor(red: 0.23, green: 0.74, blue: 1.00, alpha: 1) // #3ABEFF
-        static let panel         = UIColor(red: 0.10, green: 0.13, blue: 0.18, alpha: 1) // #1A222D
-        static let rule          = UIColor(red: 0.30, green: 0.35, blue: 0.42, alpha: 1)
+        static let textPrimary   = Tokens.UIColor.textPrimary
+        static let textSecondary = Tokens.UIColor.textSecondary
+        static let accent        = Tokens.UIColor.accent
+        static let panel         = Tokens.UIColor.panel
+        static let rule          = Tokens.UIColor.rule
     }
 
     fileprivate enum Fonts {
@@ -37,17 +90,23 @@ enum MarkdownRenderer {
         static let codeSize: CGFloat = 14
 
         static func body(weight: UIFont.Weight = .regular, italic: Bool = false) -> UIFont {
-            styled(UIFont.systemFont(ofSize: bodySize, weight: weight), italic: italic)
+            scaled(styled(UIFont.systemFont(ofSize: bodySize, weight: weight), italic: italic), style: .body)
         }
 
         static func heading(level: Int) -> UIFont {
             let sizes: [CGFloat] = [32, 24, 20, 16, 14, 13]
-            let size = sizes[min(max(level, 1), 6) - 1]
-            return UIFont.systemFont(ofSize: size, weight: .bold)
+            let styles: [UIFont.TextStyle] = [.largeTitle, .title1, .title2, .title3, .headline, .subheadline]
+            let index = min(max(level, 1), 6) - 1
+            let base = UIFont.systemFont(ofSize: sizes[index], weight: .bold)
+            return scaled(base, style: styles[index])
         }
 
         static func code(italic: Bool = false) -> UIFont {
-            styled(UIFont.monospacedSystemFont(ofSize: codeSize, weight: .regular), italic: italic)
+            scaled(styled(UIFont.monospacedSystemFont(ofSize: codeSize, weight: .regular), italic: italic), style: .body)
+        }
+
+        private static func scaled(_ font: UIFont, style: UIFont.TextStyle) -> UIFont {
+            UIFontMetrics(forTextStyle: style).scaledFont(for: font)
         }
 
         private static func styled(_ font: UIFont, italic: Bool) -> UIFont {
@@ -68,12 +127,21 @@ enum MarkdownRenderer {
         )
     }
 
+    private static func truncationNotice(shown: Int, total: Int) -> NSAttributedString {
+        plain("Preview truncated: showing the first \(shown) of \(total) characters.")
+    }
+
     fileprivate static func highlightedCode(
         _ text: String,
         languageHint: String?,
         paragraphStyle: NSParagraphStyle
     ) -> NSAttributedString {
-        let language = SyntaxHighlighter.language(for: languageHint ?? "")
+        let language: SyntaxHighlighter.Language
+        if text.utf16.count > maxFenceHighlightUTF16Count {
+            language = .plain
+        } else {
+            language = SyntaxHighlighter.language(forFenceInfo: languageHint)
+        }
         let highlighted = SyntaxHighlighter.highlight(text: text, language: language)
         let full = NSRange(location: 0, length: highlighted.length)
         highlighted.addAttribute(.paragraphStyle, value: paragraphStyle, range: full)
@@ -84,11 +152,13 @@ enum MarkdownRenderer {
     fileprivate static func horizontalRule(paragraphStyle: NSParagraphStyle) -> NSAttributedString {
         let attachment = HorizontalRuleAttachment()
         attachment.image = ruleImage
+        attachment.accessibilityLabel = "Horizontal rule"
         let result = NSMutableAttributedString(attachment: attachment)
         result.addAttributes(
             [
                 .foregroundColor: C.rule,
-                .paragraphStyle: paragraphStyle
+                .paragraphStyle: paragraphStyle,
+                .accessibilityTextualContext: UIAccessibilityTextualContext.plaintext
             ],
             range: NSRange(location: 0, length: result.length)
         )
@@ -201,7 +271,7 @@ private struct PreviewVisitor: MarkupVisitor {
 
     mutating func visitLink(_ link: Link) -> NSAttributedString {
         let previous = style.link
-        style.link = link.destination.flatMap(URL.init(string:))
+        style.link = MarkdownRenderer.sanitizedLink(from: link.destination)
         defer { style.link = previous }
         return visitChildren(link)
     }
@@ -213,7 +283,8 @@ private struct PreviewVisitor: MarkupVisitor {
     mutating func visitImage(_ image: Image) -> NSAttributedString {
         let alt = visitChildren(image)
         if alt.length > 0 { return alt }
-        return NSAttributedString(string: image.source ?? "", attributes: attributes())
+        let label = image.source.map { "Image, \($0)" } ?? "Image"
+        return NSAttributedString(string: label, attributes: attributes())
     }
 
     mutating func visitUnorderedList(_ unorderedList: UnorderedList) -> NSAttributedString {
@@ -235,11 +306,17 @@ private struct PreviewVisitor: MarkupVisitor {
             }
             let mutable = NSMutableAttributedString(attributedString: piece)
             if isFirstChild {
+                let spoken = spokenListPrefix(for: listItem)
+                let spokenAttrs: [NSAttributedString.Key: Any] = [
+                    .font: UIFont.systemFont(ofSize: 0.01),
+                    .foregroundColor: UIColor.clear
+                ]
+                mutable.insert(NSAttributedString(string: spoken, attributes: spokenAttrs), at: 0)
                 let prefix = listPrefix(for: listItem)
-                let prefixAttrs = mutable.length > 0
-                    ? mutable.attributes(at: 0, effectiveRange: nil)
+                let prefixAttrs = mutable.length > spoken.utf16.count
+                    ? mutable.attributes(at: spoken.utf16.count, effectiveRange: nil)
                     : attributes()
-                mutable.insert(NSAttributedString(string: prefix, attributes: prefixAttrs), at: 0)
+                mutable.insert(NSAttributedString(string: prefix, attributes: prefixAttrs), at: spoken.utf16.count)
                 isFirstChild = false
             }
             result.append(mutable)
@@ -351,6 +428,16 @@ private struct PreviewVisitor: MarkupVisitor {
         return "• "
     }
 
+    private func spokenListPrefix(for item: ListItem) -> String {
+        let count = item.parent?.childCount ?? 1
+        let index = item.indexInParent + 1
+        if let checkbox = item.checkbox {
+            let state = checkbox == .checked ? "Checked. " : "Not checked. "
+            return "\(state)List item \(index) of \(count). "
+        }
+        return "List item \(index) of \(count). "
+    }
+
     private func styledBlock(_ content: NSMutableAttributedString) -> NSAttributedString {
         guard content.length > 0 else { return content }
         content.addAttribute(
@@ -397,6 +484,9 @@ private struct PreviewVisitor: MarkupVisitor {
         }
         if style.strikethrough {
             attrs[.strikethroughStyle] = NSUnderlineStyle.single.rawValue
+        }
+        if let level = style.headingLevel {
+            attrs[MarkdownRenderer.headingLevelKey] = level as NSNumber
         }
         return attrs
     }
