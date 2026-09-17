@@ -15,6 +15,8 @@
 		0DDFA01E3D88810EE480FEBC /* FileService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10302C3F18B1F4163B14AD11 /* FileService.swift */; };
 		124AE2A3EBD00B8AD0385884 /* BranchPickerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 00E5131D975B6C8D2E6DD759 /* BranchPickerView.swift */; };
 		12D52EBE4A448F550A7AE9A6 /* MarkdownPreviewView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53AD0B70AAF37CC1F33F1C50 /* MarkdownPreviewView.swift */; };
+		A11E11E11E11E11E11E11E12 /* TextKit1TextView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A11E11E11E11E11E11E11E11 /* TextKit1TextView.swift */; };
+		B22E22E22E22E22E22E22E22 /* DocumentSessionStoreTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B22E22E22E22E22E22E22E21 /* DocumentSessionStoreTests.swift */; };
 		18FEBEA9EFEA0654EF44C739 /* CloneRepoViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BEDE2A0E7D0EDC11505923E /* CloneRepoViewModel.swift */; };
 		1F1684F0975C90BF64A298DF /* DocumentPickerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0DE52D40CE92EE91ABF186A6 /* DocumentPickerView.swift */; };
 		210AB9D7FA70708ED92787A6 /* FindReplaceEngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = A38B482DA9A8AA8443D2B1C0 /* FindReplaceEngine.swift */; };
@@ -65,6 +67,8 @@
 		05D54D13176827EB4F03F390 /* CodeEditorView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CodeEditorView.swift; sourceTree = "<group>"; };
 		085E387AC339944EC81BAD2A /* FindReplaceEngineTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FindReplaceEngineTests.swift; sourceTree = "<group>"; };
 		09EE625452AAFE84138D4C89 /* MarkdownRendererTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MarkdownRendererTests.swift; sourceTree = "<group>"; };
+		A11E11E11E11E11E11E11E11 /* TextKit1TextView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TextKit1TextView.swift; sourceTree = "<group>"; };
+		B22E22E22E22E22E22E22E21 /* DocumentSessionStoreTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DocumentSessionStoreTests.swift; sourceTree = "<group>"; };
 		0AADCA2A36A839E8DC836481 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
 		0DE52D40CE92EE91ABF186A6 /* DocumentPickerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DocumentPickerView.swift; sourceTree = "<group>"; };
 		10302C3F18B1F4163B14AD11 /* FileService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FileService.swift; sourceTree = "<group>"; };
@@ -124,6 +128,7 @@
 				2771780BE94769C177812889 /* FileServiceTests.swift */,
 				085E387AC339944EC81BAD2A /* FindReplaceEngineTests.swift */,
 				09EE625452AAFE84138D4C89 /* MarkdownRendererTests.swift */,
+				B22E22E22E22E22E22E22E21 /* DocumentSessionStoreTests.swift */,
 				F7D764D93D6680A7DF1FF641 /* ProjectTests.swift */,
 			);
 			path = PockeDevTests;
@@ -232,6 +237,7 @@
 				21C010ACDAC7867B5CBC3AF8 /* EditorContainerView.swift */,
 				A38B482DA9A8AA8443D2B1C0 /* FindReplaceEngine.swift */,
 				53AD0B70AAF37CC1F33F1C50 /* MarkdownPreviewView.swift */,
+				A11E11E11E11E11E11E11E11 /* TextKit1TextView.swift */,
 				145A74DF2CB6060F5FEDF1AC /* SearchOverlay.swift */,
 				4EBD3AB8B881D3F6285E4BEB /* TabsBar.swift */,
 			);
@@ -389,6 +395,7 @@
 				A06F6FEB546B039E1BC17CB4 /* HomeView.swift in Sources */,
 				B4A34D90F21511FA9B4D0FE3 /* KeychainService.swift in Sources */,
 				12D52EBE4A448F550A7AE9A6 /* MarkdownPreviewView.swift in Sources */,
+				A11E11E11E11E11E11E11E12 /* TextKit1TextView.swift in Sources */,
 				C158AE6689276B32F94DE742 /* MarkdownRenderer.swift in Sources */,
 				70EE5B578907A05800276A75 /* NewProjectView.swift in Sources */,
 				99DCB111243D6DEB2217220C /* PDButton.swift in Sources */,
@@ -413,6 +420,7 @@
 				F4F136D7EAE04AF83EA88352 /* FileServiceTests.swift in Sources */,
 				8888219D9296B10FB113019A /* FindReplaceEngineTests.swift in Sources */,
 				3B9DE231B3EB3A644EDCC6C5 /* MarkdownRendererTests.swift in Sources */,
+				B22E22E22E22E22E22E22E22 /* DocumentSessionStoreTests.swift in Sources */,
 				63A6C73DE57086E3DC532156 /* ProjectTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -668,8 +676,8 @@
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/swiftlang/swift-markdown.git";
 			requirement = {
-				kind = upToNextMajorVersion;
-				minimumVersion = 0.8.0;
+				kind = exactVersion;
+				version = 0.8.0;
 			};
 		};
 /* End XCRemoteSwiftPackageReference section */

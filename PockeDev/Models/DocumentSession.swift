@@ -12,6 +12,7 @@ struct DocumentSession: Identifiable {
     var isLoading: Bool
     var error: String?
     var languageOverride: SyntaxHighlighter.Language?  // nil = auto-detect from extension
+    var isMarkdownPreview: Bool
 
     var fileName: String { fileURL.lastPathComponent }
     var language: SyntaxHighlighter.Language {
@@ -26,5 +27,6 @@ struct DocumentSession: Identifiable {
         self.isLoading = true
         self.error = nil
         self.languageOverride = nil
+        self.isMarkdownPreview = false
     }
 }
