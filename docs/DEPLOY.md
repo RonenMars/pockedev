@@ -67,6 +67,7 @@ uploads it. Then watch it process:
 | `./scripts/ship-ios.sh` | bump build number, archive, upload |
 | `./scripts/ship-ios.sh --no-bump` | ship whatever `project.yml` already says |
 | `./scripts/ship-ios.sh --archive-only` | stop after producing the `.ipa` (inspect, don't upload) |
+| `./scripts/ship-ios.sh --build-number N` | set `CURRENT_PROJECT_VERSION` to `N` (no +1 bump) |
 
 ## Scripts
 
@@ -78,12 +79,60 @@ uploads it. Then watch it process:
 | [`poll-build.sh`](../scripts/poll-build.sh) | poll ASC for a build's processing state |
 | [`ExportOptions.plist`](../scripts/ExportOptions.plist) | export config — automatic signing, team `GUW6BN8X57` |
 
+## GitHub Actions (TestFlight workflow)
+
+[`.github/workflows/testflight.yml`](../.github/workflows/testflight.yml) runs
+the same Swift pipeline on `macos-15` (not Flutter). Trigger it from
+**Actions → TestFlight → Run workflow**, or push a `v*` tag.
+
+### Repository secrets
+
+| Secret | What it is |
+| --- | --- |
+| `ASC_KEY_ID` | App Store Connect API Key ID |
+| `ASC_ISSUER_ID` | App Store Connect Issuer ID |
+| `ASC_KEY_P8_BASE64` | `base64` of the `.p8` (no wrapping secrets file in git) |
+| `BUILD_CERTIFICATE_BASE64` | Apple Distribution certificate exported as `.p12`, then base64 |
+| `P12_PASSWORD` | Password used when exporting that `.p12` |
+| `ASC_TEAM_ID` | Optional; defaults in `ship-ios.sh` to `GUW6BN8X57` |
+
+Encode files on a Mac:
+
+```bash
+base64 -i AuthKey_XXXXXXXXXX.p8 | pbcopy
+base64 -i AppleDistribution.p12 | pbcopy
+```
+
+Export the `.p12` from Keychain Access: My Certificates → **Apple Distribution:
+… (GUW6BN8X57)** → Export → `.p12`.
+
+### Build numbers on CI
+
+TestFlight rejects duplicate `CFBundleVersion` values for the same marketing
+version. CI sets `CURRENT_PROJECT_VERSION` to
+`TESTFLIGHT_BUILD_OFFSET + github.run_number` (or the workflow input
+`build_number`). If that is not greater than the value already in
+`project.yml`, the workflow bumps once more.
+
+Set the Actions **variable** `TESTFLIGHT_BUILD_OFFSET` to a number at or above
+the last locally shipped build so the first CI run does not collide.
+
+The workflow does **not** commit the bumped `project.yml`. Local ships still
+edit the file so the repo records the last Mac-built number.
+
+### SPM / Gitty
+
+`project.yml` points Gitty at `git@github.com:RonenMars/Gitty.git`. The
+workflow rewrites `git@github.com:` to `https://github.com/` so SwiftPM can
+clone without an SSH key. If Gitty is private, grant the default `GITHUB_TOKEN`
+access or switch the package URL to HTTPS with a PAT.
+
 ## Signing model
 
-Ships use **automatic** signing (`-allowProvisioningUpdates`) against the
-**Apple Distribution** cert in the login keychain. No manual provisioning-profile
-UUIDs to track. If you ever move to headless CI (no keychain), that's when to
-add manual cert/profile import — see how `tb-mobile` does it.
+Ships use **automatic** signing (`-allowProvisioningUpdates`) plus the App
+Store Connect API key (`-authenticationKey*`). Locally the **Apple
+Distribution** cert lives in the login keychain. On GitHub Actions the same
+cert is imported from `BUILD_CERTIFICATE_BASE64` into a temporary keychain.
 
 ## Troubleshooting
 

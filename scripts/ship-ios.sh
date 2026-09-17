@@ -1,17 +1,22 @@
 #!/usr/bin/env bash
 # ship-ios.sh — archive PockeDev, export a signed .ipa, upload to TestFlight.
 #
-# Native Swift + XcodeGen pipeline. No Expo, no Fastlane, no EAS.
+# Native Swift + XcodeGen pipeline. No Expo, no Fastlane, no Flutter, no EAS.
 #   xcodegen generate → xcodebuild archive → -exportArchive → altool --upload-app
 #
-# Prereqs (one-time):
+# Prereqs (local):
 #   1. cp .env.signing.example .env.signing  and fill in your ASC API key.
 #   2. An Apple Distribution cert in your login keychain (you have one).
+#
+# Prereqs (GitHub Actions):
+#   Secrets + a Distribution .p12 imported into a temporary keychain.
+#   See .github/workflows/testflight.yml and docs/DEPLOY.md.
 #
 # Usage:
 #   source .env.signing         # or the script sources it for you
 #   ./scripts/ship-ios.sh                 # bump build number, archive, upload
 #   ./scripts/ship-ios.sh --no-bump       # ship whatever project.yml says
+#   ./scripts/ship-ios.sh --build-number N
 #   ./scripts/ship-ios.sh --archive-only  # stop before upload (inspect the .ipa)
 
 set -euo pipefail
@@ -21,21 +26,52 @@ cd "$ROOT"
 
 BUMP=1
 UPLOAD=1
-for arg in "$@"; do
-  case "$arg" in
-    --no-bump)      BUMP=0 ;;
-    --archive-only) UPLOAD=0 ;;
+BUILD_NUMBER_OVERRIDE="${BUILD_NUMBER:-}"
+while [[ $# -gt 0 ]]; do
+  case "$1" in
+    --no-bump)      BUMP=0; shift ;;
+    --archive-only) UPLOAD=0; shift ;;
+    --build-number)
+      BUILD_NUMBER_OVERRIDE="${2:?--build-number needs a value}"
+      BUMP=0
+      shift 2
+      ;;
     -h|--help)      grep '^#' "$0" | sed 's/^# \{0,1\}//'; exit 0 ;;
-    *) echo "Unknown arg: $arg" >&2; exit 2 ;;
+    *) echo "Unknown arg: $1" >&2; exit 2 ;;
   esac
 done
 
 # ── env ──
 [[ -f .env.signing ]] && source .env.signing
+
 : "${ASC_KEY_ID:?source .env.signing first (see .env.signing.example)}"
 : "${ASC_ISSUER_ID:?source .env.signing first}"
+
+# CI may pass the .p8 as base64 instead of a path.
+if [[ -n "${ASC_KEY_P8_BASE64:-}" ]]; then
+  KEY_DIR="${HOME}/.appstoreconnect/private_keys"
+  mkdir -p "$KEY_DIR"
+  umask 077
+  ASC_KEY_PATH="${ASC_KEY_PATH:-$KEY_DIR/AuthKey_${ASC_KEY_ID}.p8}"
+  python3 -c 'import base64,sys; sys.stdout.buffer.write(base64.b64decode(sys.stdin.read()))' \
+    <<<"$ASC_KEY_P8_BASE64" > "$ASC_KEY_PATH"
+  chmod 600 "$ASC_KEY_PATH"
+fi
+
 : "${ASC_KEY_PATH:?source .env.signing first}"
+[[ -r "$ASC_KEY_PATH" ]] || { echo "Cannot read ASC .p8 at $ASC_KEY_PATH" >&2; exit 1; }
+
+# altool looks in ~/.appstoreconnect/private_keys/AuthKey_<id>.p8
+ALTOOL_DIR="${HOME}/.appstoreconnect/private_keys"
+mkdir -p "$ALTOOL_DIR"
+ALTOOL_KEY="$ALTOOL_DIR/AuthKey_${ASC_KEY_ID}.p8"
+if [[ ! -e "$ALTOOL_KEY" ]] || ! cmp -s "$ASC_KEY_PATH" "$ALTOOL_KEY"; then
+  cp "$ASC_KEY_PATH" "$ALTOOL_KEY"
+  chmod 600 "$ALTOOL_KEY"
+fi
+
 command -v xcodegen >/dev/null || { echo "xcodegen not installed (brew install xcodegen)" >&2; exit 1; }
+command -v xcodebuild >/dev/null || { echo "xcodebuild not found — this pipeline is macOS/Xcode only" >&2; exit 1; }
 
 SCHEME="PockeDev"
 BUNDLE_ID="com.pockedev.app"
@@ -46,13 +82,27 @@ IPA="$EXPORT_DIR/PockeDev.ipa"
 
 mkdir -p "$BUILD_DIR"
 
-# ── bump CURRENT_PROJECT_VERSION (build number) in project.yml ──
+# ── bump / set CURRENT_PROJECT_VERSION (build number) in project.yml ──
 # ponytail: sed on the one line, not a YAML parser. project.yml has exactly one
 # CURRENT_PROJECT_VERSION. If that stops being true, switch to yq.
-if (( BUMP )); then
-  CUR=$(grep -E 'CURRENT_PROJECT_VERSION:' project.yml | grep -oE '[0-9]+' | head -1)
+CUR=$(grep -E 'CURRENT_PROJECT_VERSION:' project.yml | grep -oE '[0-9]+' | head -1)
+NEXT="$CUR"
+if [[ -n "$BUILD_NUMBER_OVERRIDE" ]]; then
+  [[ "$BUILD_NUMBER_OVERRIDE" =~ ^[0-9]+$ ]] || { echo "--build-number must be a positive integer" >&2; exit 2; }
+  NEXT="$BUILD_NUMBER_OVERRIDE"
+  if [[ "$(uname)" == Darwin ]]; then
+    sed -i '' -E "s/(CURRENT_PROJECT_VERSION: )\"?[0-9]+\"?/\1\"${NEXT}\"/" project.yml
+  else
+    sed -i -E "s/(CURRENT_PROJECT_VERSION: )\"?[0-9]+\"?/\1\"${NEXT}\"/" project.yml
+  fi
+  echo "▸ build number: $CUR → $NEXT (override)"
+elif (( BUMP )); then
   NEXT=$(( CUR + 1 ))
-  sed -i '' -E "s/(CURRENT_PROJECT_VERSION: )\"?${CUR}\"?/\1\"${NEXT}\"/" project.yml
+  if [[ "$(uname)" == Darwin ]]; then
+    sed -i '' -E "s/(CURRENT_PROJECT_VERSION: )\"?${CUR}\"?/\1\"${NEXT}\"/" project.yml
+  else
+    sed -i -E "s/(CURRENT_PROJECT_VERSION: )\"?${CUR}\"?/\1\"${NEXT}\"/" project.yml
+  fi
   echo "▸ build number: $CUR → $NEXT"
 fi
 
@@ -60,6 +110,7 @@ echo "▸ regenerating Xcode project"
 xcodegen generate --quiet
 
 echo "▸ archiving (Release)"
+# Keep the last lines on stdout but still fail if xcodebuild fails (pipefail).
 xcodebuild archive \
   -project PockeDev.xcodeproj \
   -scheme "$SCHEME" \
@@ -70,7 +121,9 @@ xcodebuild archive \
   -authenticationKeyID "$ASC_KEY_ID" \
   -authenticationKeyIssuerID "$ASC_ISSUER_ID" \
   -authenticationKeyPath "$ASC_KEY_PATH" \
-  | tail -20
+  CODE_SIGN_STYLE=Automatic \
+  DEVELOPMENT_TEAM="${ASC_TEAM_ID:-GUW6BN8X57}" \
+  | tee "$BUILD_DIR/archive.log" | tail -30
 
 echo "▸ exporting signed .ipa"
 rm -rf "$EXPORT_DIR"
@@ -82,9 +135,9 @@ xcodebuild -exportArchive \
   -authenticationKeyID "$ASC_KEY_ID" \
   -authenticationKeyIssuerID "$ASC_ISSUER_ID" \
   -authenticationKeyPath "$ASC_KEY_PATH" \
-  | tail -20
+  | tee "$BUILD_DIR/export.log" | tail -30
 
-[[ -f "$IPA" ]] || { echo "✗ export produced no .ipa at $IPA" >&2; exit 1; }
+[[ -f "$IPA" ]] || { echo "✗ export produced no .ipa at $IPA" >&2; ls -la "$EXPORT_DIR" >&2 || true; exit 1; }
 echo "✓ archived: $IPA"
 
 if (( ! UPLOAD )); then
@@ -93,6 +146,7 @@ if (( ! UPLOAD )); then
 fi
 
 echo "▸ uploading to App Store Connect"
+# Delete leftover IPAs would be a Flutter glob hazard; we upload a single path.
 xcrun altool --upload-app \
   --type ios \
   --file "$IPA" \
@@ -100,4 +154,4 @@ xcrun altool --upload-app \
   --apiIssuer "$ASC_ISSUER_ID"
 
 echo "✓ uploaded. Poll processing status with:"
-echo "    ./scripts/poll-build.sh $BUNDLE_ID --watch"
+echo "    ./scripts/poll-build.sh $BUNDLE_ID --build-version $NEXT --watch"
