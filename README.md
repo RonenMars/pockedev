@@ -172,14 +172,28 @@ All other functionality uses Apple frameworks: `SwiftUI`, `UIKit`, `Foundation`,
 
 ## Deploy
 
-Ship to TestFlight with the pipeline in [`scripts/`](scripts):
+Ship to TestFlight with the native Swift pipeline in [`scripts/`](scripts)
+(XcodeGen + `xcodebuild`, not Flutter):
 
 ```bash
 source .env.signing
 ./scripts/ship-ios.sh
 ```
 
-See [`docs/DEPLOY.md`](docs/DEPLOY.md) for one-time signing setup (including the 1Password bootstrap) and the full flow.
+From GitHub: **Actions → TestFlight → Run workflow** (see
+[`.github/workflows/testflight.yml`](.github/workflows/testflight.yml)).
+
+To copy local `.env.signing` into Actions secrets (needs `gh` on your Mac):
+
+```bash
+export BUILD_CERTIFICATE_PATH="$HOME/path/to/AppleDistribution.p12"
+export P12_PASSWORD='...'
+./scripts/push-github-secrets.sh --dry-run
+./scripts/push-github-secrets.sh
+```
+
+See [`docs/DEPLOY.md`](docs/DEPLOY.md) for one-time signing setup (including the
+1Password bootstrap), CI secrets, and the full flow.
 
 ---
 
