@@ -74,6 +74,7 @@ uploads it. Then watch it process:
 | File | Purpose |
 | --- | --- |
 | [`ship-ios.sh`](../scripts/ship-ios.sh) | the pipeline — archive, export, upload |
+| [`push-github-secrets.sh`](../scripts/push-github-secrets.sh) | copy local env into GitHub Actions secrets via `gh` |
 | [`bootstrap-signing-op.sh`](../scripts/bootstrap-signing-op.sh) | write `.env.signing` from 1Password |
 | [`asc-jwt.sh`](../scripts/asc-jwt.sh) | mint a short-lived ES256 JWT for the ASC API |
 | [`poll-build.sh`](../scripts/poll-build.sh) | poll ASC for a build's processing state |
@@ -84,6 +85,25 @@ uploads it. Then watch it process:
 [`.github/workflows/testflight.yml`](../.github/workflows/testflight.yml) runs
 the same Swift pipeline on `macos-15` (not Flutter). Trigger it from
 **Actions → TestFlight → Run workflow**, or push a `v*` tag.
+
+### Push secrets from your Mac
+
+`git` cannot write Actions secrets. Use [`scripts/push-github-secrets.sh`](../scripts/push-github-secrets.sh)
+and the GitHub CLI (`gh auth login`, repo admin). It reads the process
+environment first, then `.env.signing` / `.env` in the current directory
+(or `--env FILE`). `ASC_KEY_PATH` is turned into `ASC_KEY_P8_BASE64`.
+
+```bash
+export BUILD_CERTIFICATE_PATH="$HOME/path/to/AppleDistribution.p12"
+export P12_PASSWORD='...'          # password from the Keychain .p12 export
+# optional: export TESTFLIGHT_BUILD_OFFSET=10
+cd /path/to/pockedev
+./scripts/push-github-secrets.sh --dry-run
+./scripts/push-github-secrets.sh
+```
+
+The script never prints secret values. This cloud/Linux environment cannot
+run `gh secret set` for you.
 
 ### Repository secrets
 

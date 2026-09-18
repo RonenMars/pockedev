@@ -84,7 +84,7 @@ Tell the user:
 
 ## GitHub Actions
 
-1. Confirm secrets `ASC_KEY_ID`, `ASC_ISSUER_ID`, `ASC_KEY_P8_BASE64`, `BUILD_CERTIFICATE_BASE64`, `P12_PASSWORD` exist.
+1. Confirm secrets `ASC_KEY_ID`, `ASC_ISSUER_ID`, `ASC_KEY_P8_BASE64`, `BUILD_CERTIFICATE_BASE64`, `P12_PASSWORD` exist. If the repo is empty, the user runs `./scripts/push-github-secrets.sh` on their Mac (`gh` + `.env.signing` + a `.p12` path). Do not open `.env.signing`. Do not print secret values.
 2. Trigger **TestFlight** via `workflow_dispatch` (or push a `v*` tag).
 3. If CI build numbers collide with local ships, set Actions variable `TESTFLIGHT_BUILD_OFFSET`.
 4. Do not commit the API key or `.p12`.
