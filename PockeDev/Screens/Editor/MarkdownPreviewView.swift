@@ -76,7 +76,7 @@ struct MarkdownPreviewView: UIViewRepresentable {
 
         func refreshHeadingRanges(in rendered: NSAttributedString) {
             var ranges: [(NSRange, Int)] = []
-            let key = NSAttributedString.Key(UIAccessibilitySpeechAttributeHeadingLevel)
+            let key = NSAttributedString.Key.accessibilityTextHeadingLevel
             let full = NSRange(location: 0, length: rendered.length)
             rendered.enumerateAttribute(key, in: full) { value, range, _ in
                 guard let level = (value as? NSNumber)?.intValue ?? value as? Int else { return }
