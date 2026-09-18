@@ -90,7 +90,7 @@ uploads it. Then watch it process:
 ## GitHub Actions (TestFlight workflow)
 
 [`.github/workflows/testflight.yml`](../.github/workflows/testflight.yml) runs
-the same Swift pipeline on `macos-15` (not Flutter). Trigger it from
+the same Swift pipeline on `macos-26` with Xcode 26.6 pinned (not Flutter). Trigger it from
 **Actions → TestFlight → Run workflow**, or push a `v*` tag.
 
 ### Push secrets from your Mac
