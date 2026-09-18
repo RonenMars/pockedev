@@ -21,7 +21,7 @@ final class MarkdownRendererTests: XCTestCase {
         XCTAssertTrue(font?.fontDescriptor.symbolicTraits.contains(.traitBold) == true)
 
         let level = result.attribute(
-            NSAttributedString.Key(UIAccessibilitySpeechAttributeHeadingLevel),
+            NSAttributedString.Key.accessibilityTextHeadingLevel,
             at: 0,
             effectiveRange: nil
         ) as? NSNumber

@@ -16,7 +16,7 @@ enum MarkdownRenderer {
     static let maxFenceHighlightUTF16Count = 16_000
 
     private static let allowedLinkSchemes: Set<String> = ["http", "https", "mailto"]
-    fileprivate static let headingLevelKey = NSAttributedString.Key(UIAccessibilitySpeechAttributeHeadingLevel)
+    fileprivate static let headingLevelKey = NSAttributedString.Key.accessibilityTextHeadingLevel
 
     static func prepare() {
         _ = ruleImage
@@ -158,7 +158,7 @@ enum MarkdownRenderer {
             [
                 .foregroundColor: C.rule,
                 .paragraphStyle: paragraphStyle,
-                .accessibilityTextualContext: UIAccessibilityTextualContext.plaintext
+                .UIAccessibilityTextAttributeContext: UIAccessibilityTextualContext.narrative.rawValue
             ],
             range: NSRange(location: 0, length: result.length)
         )
