@@ -13,9 +13,19 @@
 #   2. eval "$(op signin)"
 #   3. ./scripts/bootstrap-signing-op.sh
 #   4. source .env.signing && ./scripts/ship-ios.sh
+#
+# --with-cert (for pushing to GitHub Actions): additionally exports the Apple
+# Distribution identity from the login keychain — where tb-mobile also gets it, it is
+# not kept in 1Password — to ~/.appstoreconnect/AppleDistribution.p12 and adds
+# BUILD_CERTIFICATE_PATH + P12_PASSWORD to .env.signing, which is what
+# scripts/push-github-secrets.sh reads. The password comes from the optional 1Password
+# field OP_P12_PASSWORD_FIELD (default p12_password), else it is generated.
 
 set -euo pipefail
 cd "$(dirname "$0")/.."   # repo root
+
+WITH_CERT=0
+[[ "${1:-}" == "--with-cert" ]] && WITH_CERT=1
 
 command -v op >/dev/null || { echo "1Password CLI (op) not installed: brew install 1password-cli" >&2; exit 1; }
 
@@ -62,6 +72,23 @@ export ASC_ISSUER_ID=${ISSUER_ID}
 export ASC_KEY_PATH="${KEY_PATH}"
 export ASC_TEAM_ID=${TEAM_ID}
 EOF
+
+if (( WITH_CERT )); then
+  security find-identity -v -p codesigning | grep -q "Apple Distribution" \
+    || { echo "✗ no 'Apple Distribution' identity in the login keychain" >&2; exit 1; }
+  P12_PATH="${HOME}/.appstoreconnect/AppleDistribution.p12"
+  P12_PASSWORD="$(opread "${OP_P12_PASSWORD_FIELD:-p12_password}" 2>/dev/null || true)"
+  P12_PASSWORD="${P12_PASSWORD:-$(openssl rand -hex 16)}"
+  echo "▸ exporting Distribution identity from login keychain (approve the prompt)"
+  # ponytail: security export can't select one identity, so the .p12 holds them all.
+  security export -k login.keychain-db -t identities -f pkcs12 -P "$P12_PASSWORD" -o "$P12_PATH" >/dev/null
+  chmod 600 "$P12_PATH"
+  cat >> .env.signing <<ENVEND
+export BUILD_CERTIFICATE_PATH="${P12_PATH}"
+export P12_PASSWORD="${P12_PASSWORD}"
+ENVEND
+  echo "  .p12: ${P12_PATH} (BUILD_CERTIFICATE_PATH, P12_PASSWORD added to .env.signing)"
+fi
 
 echo "✓ .env.signing written (key ${KEY_ID}, team ${TEAM_ID})"
 echo "  Next: source .env.signing && ./scripts/ship-ios.sh"

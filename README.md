@@ -186,8 +186,7 @@ From GitHub: **Actions → TestFlight → Run workflow** (see
 To copy local `.env.signing` into Actions secrets (needs `gh` on your Mac):
 
 ```bash
-export BUILD_CERTIFICATE_PATH="$HOME/path/to/AppleDistribution.p12"
-export P12_PASSWORD='...'
+./scripts/bootstrap-signing-op.sh --with-cert   # adds the keychain cert to .env.signing
 ./scripts/push-github-secrets.sh --dry-run
 ./scripts/push-github-secrets.sh
 ```
