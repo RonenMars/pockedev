@@ -28,6 +28,13 @@ eval "$(op signin)"
 ./scripts/bootstrap-signing-op.sh
 ```
 
+Add `--with-cert` before pushing secrets to GitHub: it also exports the Apple
+Distribution cert from the login keychain (like tb-mobile, it is not kept in
+1Password) to `~/.appstoreconnect/AppleDistribution.p12` and appends
+`BUILD_CERTIFICATE_PATH` / `P12_PASSWORD` to `.env.signing`. The password comes
+from an optional `p12_password` field on the item (`OP_P12_PASSWORD_FIELD`),
+else it is generated.
+
 `scripts/.env.signing-op` names the vault/item/fields to read (not secrets — it's
 gitignored anyway). If the `.p8` isn't already on disk, the script materializes
 it from the item's `auth_key_b64` field.
@@ -91,11 +98,14 @@ the same Swift pipeline on `macos-15` (not Flutter). Trigger it from
 `git` cannot write Actions secrets. Use [`scripts/push-github-secrets.sh`](../scripts/push-github-secrets.sh)
 and the GitHub CLI (`gh auth login`, repo admin). It reads the process
 environment first, then `.env.signing` / `.env` in the current directory
-(or `--env FILE`). `ASC_KEY_PATH` is turned into `ASC_KEY_P8_BASE64`.
+(or `--env FILE`). `ASC_KEY_PATH` is turned into `ASC_AUTH_KEY_B64`.
 
 ```bash
-export BUILD_CERTIFICATE_PATH="$HOME/path/to/AppleDistribution.p12"
-export P12_PASSWORD='...'          # password from the Keychain .p12 export
+# BUILD_CERTIFICATE_PATH / P12_PASSWORD are optional: with neither set, the script
+# exports the Apple Distribution identity from your login keychain (approve the
+# Keychain Access prompt) and generates the .p12 password itself.
+# export BUILD_CERTIFICATE_PATH="$HOME/path/to/AppleDistribution.p12"
+# export P12_PASSWORD='...'
 # optional: export TESTFLIGHT_BUILD_OFFSET=10
 cd /path/to/pockedev
 ./scripts/push-github-secrets.sh --dry-run
@@ -111,9 +121,9 @@ run `gh secret set` for you.
 | --- | --- |
 | `ASC_KEY_ID` | App Store Connect API Key ID |
 | `ASC_ISSUER_ID` | App Store Connect Issuer ID |
-| `ASC_KEY_P8_BASE64` | `base64` of the `.p8` (no wrapping secrets file in git) |
-| `BUILD_CERTIFICATE_BASE64` | Apple Distribution certificate exported as `.p12`, then base64 |
-| `P12_PASSWORD` | Password used when exporting that `.p12` |
+| `ASC_AUTH_KEY_B64` | `base64` of the `.p8` (no wrapping secrets file in git) |
+| `IOS_DIST_CERT_P12_B64` | Apple Distribution certificate exported as `.p12`, then base64 |
+| `IOS_DIST_CERT_PASSWORD` | Password used when exporting that `.p12` |
 | `ASC_TEAM_ID` | Optional; defaults in `ship-ios.sh` to `GUW6BN8X57` |
 
 Encode files on a Mac:
@@ -152,7 +162,7 @@ access or switch the package URL to HTTPS with a PAT.
 Ships use **automatic** signing (`-allowProvisioningUpdates`) plus the App
 Store Connect API key (`-authenticationKey*`). Locally the **Apple
 Distribution** cert lives in the login keychain. On GitHub Actions the same
-cert is imported from `BUILD_CERTIFICATE_BASE64` into a temporary keychain.
+cert is imported from `IOS_DIST_CERT_P12_B64` into a temporary keychain.
 
 ## Troubleshooting
 

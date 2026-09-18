@@ -8,8 +8,9 @@
 #   3. otherwise ./.env.signing then ./.env in the directory you run from
 #
 # Maps local ship-ios vars onto the TestFlight workflow names:
-#   ASC_KEY_PATH → secret ASC_KEY_P8_BASE64 (file contents, base64)
-#   BUILD_CERTIFICATE_PATH or P12_PATH → secret BUILD_CERTIFICATE_BASE64
+#   ASC_KEY_PATH → secret ASC_AUTH_KEY_B64 (file contents, base64)
+#   BUILD_CERTIFICATE_PATH or P12_PATH → secret IOS_DIST_CERT_P12_B64
+#     (unset → exported from the login keychain; P12_PASSWORD is generated if unset)
 #
 # Usage (run on your Mac; gh must be logged in with repo admin):
 #   ./scripts/push-github-secrets.sh --dry-run
@@ -120,6 +121,23 @@ if [[ -z "${BUILD_CERTIFICATE_BASE64:-}" && -n "$CERT_PATH" ]]; then
   export BUILD_CERTIFICATE_BASE64
 fi
 
+# No .p12 on disk? The Distribution cert lives in the login keychain (same as
+# tb-mobile), so export it from there. Keychain Access may prompt to allow the
+# export. ponytail: `security export` can't pick one identity, so the .p12 holds
+# every identity in the login keychain; harmless, xcodebuild picks the right one.
+if [[ -z "${BUILD_CERTIFICATE_BASE64:-}" && -z "$CERT_PATH" ]]; then
+  security find-identity -v -p codesigning | grep -q "Apple Distribution" \
+    || { echo "No 'Apple Distribution' identity in login keychain; set BUILD_CERTIFICATE_PATH" >&2; exit 1; }
+  echo "▸ exporting Distribution identity from login keychain"
+  P12_PASSWORD="${P12_PASSWORD:-$(openssl rand -hex 16)}"
+  export P12_PASSWORD
+  tmp_p12="$(mktemp -t dist).p12"
+  trap 'rm -f "$tmp_p12"' EXIT
+  security export -k login.keychain-db -t identities -f pkcs12 -P "$P12_PASSWORD" -o "$tmp_p12" >/dev/null
+  BUILD_CERTIFICATE_BASE64="$(b64_file "$tmp_p12" keychain-export)"
+  export BUILD_CERTIFICATE_BASE64
+fi
+
 command -v gh >/dev/null || { echo "gh CLI not installed: https://cli.github.com/" >&2; exit 1; }
 command -v python3 >/dev/null || { echo "python3 is required" >&2; exit 1; }
 
@@ -176,7 +194,8 @@ From .env.signing (or the environment):
   ASC_KEY_ID, ASC_ISSUER_ID, ASC_KEY_PATH  →  ASC_KEY_P8_BASE64
   ASC_TEAM_ID (optional)
 
-Plus a Distribution .p12 (same team cert as Tabby is fine):
+Plus a Distribution .p12. Leave both unset to export it from the login keychain,
+or point at an existing file:
   export BUILD_CERTIFICATE_PATH=/path/to/AppleDistribution.p12
   export P12_PASSWORD='...'
 
@@ -191,9 +210,9 @@ fi
 echo "▸ secrets"
 put_secret ASC_KEY_ID "$ASC_KEY_ID"
 put_secret ASC_ISSUER_ID "$ASC_ISSUER_ID"
-put_secret ASC_KEY_P8_BASE64 "$ASC_KEY_P8_BASE64"
-put_secret BUILD_CERTIFICATE_BASE64 "$BUILD_CERTIFICATE_BASE64"
-put_secret P12_PASSWORD "$P12_PASSWORD"
+put_secret ASC_AUTH_KEY_B64 "$ASC_KEY_P8_BASE64"
+put_secret IOS_DIST_CERT_P12_B64 "$BUILD_CERTIFICATE_BASE64"
+put_secret IOS_DIST_CERT_PASSWORD "$P12_PASSWORD"
 put_secret ASC_TEAM_ID "${ASC_TEAM_ID:-}"
 
 echo "▸ variables"
