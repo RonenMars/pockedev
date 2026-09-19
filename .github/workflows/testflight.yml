@@ -47,6 +47,9 @@ jobs:
     name: Build IPA and upload to TestFlight
     runs-on: macos-26
     timeout-minutes: 90
+    permissions:
+      contents: write        # push the build-number bump branch
+      pull-requests: write   # open and merge the bump PR
     env:
       # Pin the toolchain the app is built with locally (Xcode 26.6). macos-15 tops
       # out at Xcode 16.4, whose SDK lacks APIs the sources use.
@@ -135,6 +138,41 @@ jobs:
           ./scripts/ship-ios.sh "${extra[@]}"
           # ship-ios.sh may raise the number past what App Store Connect already has.
           echo "build_number=$(grep -E 'CURRENT_PROJECT_VERSION:' project.yml | grep -oE '[0-9]+' | head -1)" >> "$GITHUB_OUTPUT"
+
+      # main's project.yml otherwise falls behind TestFlight (the job never commits
+      # its own checkout). Only the one line lands, on top of origin/main, so a
+      # tag or branch build never leaks other changes. Needs "Allow GitHub Actions
+      # to create and approve pull requests" and no required checks on main.
+      - name: Open and merge build number bump PR to main
+        if: success() && github.event.inputs.archive_only != 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          SHIPPED: ${{ steps.ship.outputs.build_number }}
+        run: |
+          set -euo pipefail
+          git fetch origin main
+          MAIN_BN=$(git show origin/main:project.yml | grep -E 'CURRENT_PROJECT_VERSION:' | grep -oE '[0-9]+' | head -1)
+          if (( SHIPPED <= MAIN_BN )); then
+            echo "main already at build $MAIN_BN (shipped $SHIPPED) — nothing to do"
+            exit 0
+          fi
+          BRANCH="chore/bump-build-number-${SHIPPED}"
+          TITLE="chore(ios): bump build number to ${SHIPPED}"
+          git config user.name  "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git worktree add "$RUNNER_TEMP/bump" origin/main
+          (
+            cd "$RUNNER_TEMP/bump"
+            sed -i '' -E "s/(CURRENT_PROJECT_VERSION: )\"?[0-9]+\"?/\1\"${SHIPPED}\"/" project.yml
+            git commit -am "$TITLE"
+            git push --force origin "HEAD:refs/heads/${BRANCH}"
+          )
+          git worktree remove --force "$RUNNER_TEMP/bump"
+          gh pr create --base main --head "$BRANCH" --title "$TITLE" \
+            --body "Automated bump after build ${SHIPPED} uploaded to TestFlight (run ${{ github.run_id }})." \
+            || echo "PR for $BRANCH already exists"
+          gh pr merge "$BRANCH" --squash --delete-branch --subject "$TITLE"
+          echo "- Bumped main to build \`${SHIPPED}\`" >> "$GITHUB_STEP_SUMMARY"
 
       - name: Upload IPA artifact
         if: always()

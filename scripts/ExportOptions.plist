@@ -8,5 +8,7 @@
   <key>uploadSymbols</key><true/>
   <key>stripSwiftSymbols</key><true/>
   <key>destination</key><string>export</string>
+  <!-- ship-ios.sh already picks a free build number; stop Xcode renumbering it on export. -->
+  <key>manageAppVersionAndBuildNumber</key><false/>
 </dict>
 </plist>
