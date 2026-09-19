@@ -150,8 +150,15 @@ altool accepts a duplicate and Apple only rejects it afterwards by email, so
 without this check a green run can leave nothing in TestFlight.
 `TESTFLIGHT_BUILD_OFFSET` is now just the starting guess.
 
-The workflow does **not** commit the bumped `project.yml`. Local ships still
-edit the file so the repo records the last Mac-built number.
+`scripts/ExportOptions.plist` sets `manageAppVersionAndBuildNumber` to `false`,
+so Xcode's export keeps that number instead of silently picking its own.
+
+After a successful upload, the workflow opens and squash-merges a
+`chore(ios): bump build number to N` PR that changes only
+`CURRENT_PROJECT_VERSION` on top of `origin/main`. It uses `GITHUB_TOKEN`, so the
+repo needs **Settings → Actions → General → Allow GitHub Actions to create and
+approve pull requests**, and main must have no required checks. Local ships
+still only edit the file in the working tree; commit it yourself.
 
 ### SPM / Gitty
 
