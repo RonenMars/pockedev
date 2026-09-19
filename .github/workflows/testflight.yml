@@ -125,6 +125,7 @@ jobs:
           echo "Using CURRENT_PROJECT_VERSION=$next (was $cur)"
 
       - name: Ship
+        id: ship
         run: |
           extra=()
           extra+=(--build-number "${{ steps.version.outputs.build_number }}")
@@ -132,12 +133,14 @@ jobs:
             extra+=(--archive-only)
           fi
           ./scripts/ship-ios.sh "${extra[@]}"
+          # ship-ios.sh may raise the number past what App Store Connect already has.
+          echo "build_number=$(grep -E 'CURRENT_PROJECT_VERSION:' project.yml | grep -oE '[0-9]+' | head -1)" >> "$GITHUB_OUTPUT"
 
       - name: Upload IPA artifact
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: PockeDev-${{ steps.version.outputs.build_number }}
+          name: PockeDev-${{ steps.ship.outputs.build_number || steps.version.outputs.build_number }}
           path: build/export/*.ipa
           if-no-files-found: ignore
           retention-days: 14
@@ -148,7 +151,7 @@ jobs:
           {
             echo "## TestFlight"
             echo "- Marketing version: \`$(grep MARKETING_VERSION project.yml | head -1)\`"
-            echo "- Build number: \`${{ steps.version.outputs.build_number }}\`"
+            echo "- Build number: \`${{ steps.ship.outputs.build_number }}\`"
             echo "- IPA: \`build/export/PockeDev.ipa\`"
             if [[ "${{ github.event.inputs.archive_only }}" == "true" ]]; then
               echo "- Upload skipped (\`archive_only\`)"
