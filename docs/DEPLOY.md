@@ -144,8 +144,11 @@ version. CI sets `CURRENT_PROJECT_VERSION` to
 `build_number`). If that is not greater than the value already in
 `project.yml`, the workflow bumps once more.
 
-Set the Actions **variable** `TESTFLIGHT_BUILD_OFFSET` to a number at or above
-the last locally shipped build so the first CI run does not collide.
+Before uploading, `ship-ios.sh` (local and CI) asks App Store Connect for the
+highest build number it already has and raises the number past it if needed.
+altool accepts a duplicate and Apple only rejects it afterwards by email, so
+without this check a green run can leave nothing in TestFlight.
+`TESTFLIGHT_BUILD_OFFSET` is now just the starting guess.
 
 The workflow does **not** commit the bumped `project.yml`. Local ships still
 edit the file so the repo records the last Mac-built number.

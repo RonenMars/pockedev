@@ -106,6 +106,33 @@ elif (( BUMP )); then
   echo "▸ build number: $CUR → $NEXT"
 fi
 
+# ── never reuse a build number App Store Connect already has ──
+# altool accepts a duplicate CFBundleVersion and Apple rejects it afterwards by
+# email, so the upload looks green while nothing reaches TestFlight.
+# ponytail: max over the last 200 uploads; page through /builds if that's ever too few.
+if (( UPLOAD )); then
+  command -v jq >/dev/null || { echo "jq not installed (brew install jq)" >&2; exit 1; }
+  JWT=$(ASC_KEY_ID="$ASC_KEY_ID" ASC_ISSUER_ID="$ASC_ISSUER_ID" ASC_KEY_PATH="$ASC_KEY_PATH" "$ROOT/scripts/asc-jwt.sh")
+  asc_get() { curl -sS -G --fail-with-body --connect-timeout 5 --max-time 15 -H "Authorization: Bearer $JWT" "$@"; }
+  APP_ID=$(asc_get https://api.appstoreconnect.apple.com/v1/apps \
+    --data-urlencode "filter[bundleId]=$BUNDLE_ID" | jq -r '.data[0].id // empty')
+  [[ -n "$APP_ID" ]] || { echo "✗ $BUNDLE_ID not found in App Store Connect" >&2; exit 1; }
+  LATEST=$(asc_get https://api.appstoreconnect.apple.com/v1/builds \
+    --data-urlencode "filter[app]=$APP_ID" \
+    --data-urlencode "sort=-uploadedDate" \
+    --data-urlencode "limit=200" \
+    --data-urlencode "fields[builds]=version" | jq '[.data[].attributes.version | tonumber] | max // 0')
+  if (( NEXT <= LATEST )); then
+    echo "▸ build number: $NEXT already used in App Store Connect (latest $LATEST) → $((LATEST + 1))"
+    NEXT=$(( LATEST + 1 ))
+    if [[ "$(uname)" == Darwin ]]; then
+      sed -i '' -E "s/(CURRENT_PROJECT_VERSION: )\"?[0-9]+\"?/\1\"${NEXT}\"/" project.yml
+    else
+      sed -i -E "s/(CURRENT_PROJECT_VERSION: )\"?[0-9]+\"?/\1\"${NEXT}\"/" project.yml
+    fi
+  fi
+fi
+
 echo "▸ regenerating Xcode project"
 xcodegen generate --quiet
 
